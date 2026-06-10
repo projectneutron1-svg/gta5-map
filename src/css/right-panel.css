@@ -1,18 +1,17 @@
 /* ──────────────────────────────────────────────────────────────────────────────
-   right-panel.css  –  Sliding right info panel for rich mission / location cards.
+   right-panel.css  –  Right info panel for rich mission / location cards.
    ────────────────────────────────────────────────────────────────────────────── */
 
-/* ── CSS custom properties for card components ── */
 :root {
-  --color-background-primary:    #161b22;
-  --color-background-secondary:  rgba(255,255,255,0.05);
-  --color-background-tertiary:   rgba(255,255,255,0.08);
-  --color-border-tertiary:       rgba(255,255,255,0.07);
-  --color-border-secondary:      rgba(255,255,255,0.12);
-  --color-text-primary:          #e6edf3;
-  --color-text-secondary:        #8b949e;
-  --border-radius-lg:            12px;
-  --rp-width:                    460px;
+  --color-background-primary:   #161b22;
+  --color-background-secondary: rgba(255,255,255,0.05);
+  --color-background-tertiary:  rgba(255,255,255,0.08);
+  --color-border-tertiary:      rgba(255,255,255,0.07);
+  --color-border-secondary:     rgba(255,255,255,0.12);
+  --color-text-primary:         #e6edf3;
+  --color-text-secondary:       #8b949e;
+  --border-radius-lg:           12px;
+  --rp-width:                   460px;
 }
 
 /* ── Panel shell ── */
@@ -27,21 +26,20 @@
   z-index:    10;
   overflow:   hidden;
   position:   relative;
-
-  /* slide in/out transition */
   transition: width 0.3s ease, min-width 0.3s ease, opacity 0.25s ease;
   opacity:    1;
 }
 
+/* Hidden state — zero width, invisible */
 #right-panel.rp-hidden {
-  width:     0;
-  min-width: 0;
-  opacity:   0;
+  width:      0 !important;
+  min-width:  0 !important;
+  opacity:    0;
   pointer-events: none;
-  overflow:  hidden;
+  border:     none;
 }
 
-/* ── Panel header ── */
+/* ── Header ── */
 #rp-header {
   display:     flex;
   align-items: center;
@@ -52,11 +50,11 @@
 }
 
 #rp-title {
-  font-size:   12px;
-  font-weight: 700;
+  font-size:      12px;
+  font-weight:    700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color:       var(--muted);
+  color:          var(--muted);
 }
 
 #rp-close {
@@ -70,11 +68,7 @@
   line-height:   1;
   transition:    background 0.15s, color 0.15s;
 }
-
-#rp-close:hover {
-  background: rgba(255,255,255,0.08);
-  color:      var(--text);
-}
+#rp-close:hover { background: rgba(255,255,255,0.08); color: var(--text); }
 
 /* ── Scrollable body ── */
 #rp-body {
@@ -90,29 +84,17 @@
   border-radius: 2px;
 }
 
-/* ── No-card placeholder ── */
+/* ── Placeholder when no card ── */
 .rp-placeholder {
-  display:     flex;
-  flex-direction: column;
-  align-items: center;
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
   justify-content: center;
-  height:      100%;
-  gap:         12px;
-  color:       var(--muted);
-  text-align:  center;
-  padding:     32px;
+  height:          100%;
+  gap:             12px;
+  color:           var(--muted);
+  text-align:      center;
+  padding:         32px;
 }
-
-.rp-placeholder .rp-icon {
-  font-size: 40px;
-  opacity:   0.3;
-}
-
-.rp-placeholder p {
-  font-size:   12px;
-  line-height: 1.6;
-  max-width:   200px;
-}
-
-/* ── Tabler icon fallbacks (when CDN icons not loaded) ── */
-.ti::before { font-family: 'tabler-icons', sans-serif; }
+.rp-placeholder .rp-icon { font-size:40px; opacity:0.3; }
+.rp-placeholder p { font-size:12px; line-height:1.6; max-width:200px; }
