@@ -1,6 +1,9 @@
 /**
  * src/js/detail.js
  *
+ * FIXED: Clear pending popup timer before setting a new one to prevent
+ * race condition where a stale popup opens on top of a new selection.
+ *
  * Controls the sliding detail card at the bottom of the sidebar.
  * Exposes `showDetail` and `flyTo` for use by tree.js and search.js.
  *
@@ -17,9 +20,11 @@ const dcChar  = document.getElementById('dc-char');
 const dcDesc  = document.getElementById('dc-desc');
 const dcImgs  = document.getElementById('dc-imgs');
 
+// BUG FIX: track the popup timer so we can cancel it before opening a new one
+let _popupTimer = null;
+
 /**
  * Fly the map to a location and zoom to the appropriate level.
- *
  * @param {number} idx – Index into LOCS.
  */
 function flyTo(idx) {
@@ -31,7 +36,6 @@ function flyTo(idx) {
 /**
  * Populate and reveal the detail card for the given location.
  * Also opens the Leaflet popup after the fly animation completes.
- *
  * @param {number} idx – Index into LOCS.
  */
 function showDetail(idx) {
@@ -51,7 +55,6 @@ function showDetail(idx) {
 
   dcDesc.textContent = loc.desc || 'No description available.';
 
-  // Image strip
   dcImgs.innerHTML = '';
   if (loc.imgs && loc.imgs.length) {
     loc.imgs.forEach((url) => {
@@ -67,10 +70,12 @@ function showDetail(idx) {
   detailCard.classList.add('visible');
   treeWrap.classList.add('card-open');
 
-  // Open popup after fly animation
-  setTimeout(() => {
+  // BUG FIX: clear any pending popup timer before setting a new one
+  if (_popupTimer) clearTimeout(_popupTimer);
+  _popupTimer = setTimeout(() => {
     const marker = markerMap.get(idx);
     if (marker) marker.openPopup();
+    _popupTimer = null;
   }, 850);
 }
 
@@ -79,6 +84,7 @@ function closeDetail() {
   detailCard.classList.remove('visible');
   treeWrap.classList.remove('card-open');
   document.querySelectorAll('.tree-item').forEach((el) => el.classList.remove('active'));
+  if (_popupTimer) { clearTimeout(_popupTimer); _popupTimer = null; }
 }
 
 dcClose.addEventListener('click', closeDetail);
