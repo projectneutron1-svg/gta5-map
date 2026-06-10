@@ -1,110 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GTA V – San Andreas Interactive Map</title>
-
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-
-  <!-- App Styles -->
-  <link rel="stylesheet" href="src/css/variables.css" />
-  <link rel="stylesheet" href="src/css/base.css" />
-  <link rel="stylesheet" href="src/css/sidebar.css" />
-  <link rel="stylesheet" href="src/css/tree.css" />
-  <link rel="stylesheet" href="src/css/detail-card.css" />
-  <link rel="stylesheet" href="src/css/map.css" />
-  <link rel="stylesheet" href="src/css/leaflet-overrides.css" />
+  <meta charset="utf-8"/>
+  <title>GTA V San Andreas Map – Moved</title>
+  <style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#0b0f14;color:#e2eaf3;text-align:center}</style>
 </head>
 <body>
-  <div id="app">
-
-    <!-- ── Sidebar ── -->
-    <aside id="sidebar">
-
-      <!-- Header: logo + search -->
-      <div id="sb-header">
-        <div id="sb-logo">
-          <span class="icon" aria-hidden="true">🗺</span>
-          <h1>GTA V <small>San Andreas Interactive Map</small></h1>
-        </div>
-        <div id="search-wrap">
-          <span id="search-icon" aria-hidden="true">🔍</span>
-          <input
-            id="search-input"
-            type="search"
-            placeholder="Search locations, missions, collectibles…"
-            autocomplete="off"
-            aria-label="Search map locations"
-          />
-        </div>
-        <div id="search-results" role="listbox" aria-label="Search results"></div>
-      </div>
-
-      <!-- Progress bar -->
-      <div id="progress-bar">
-        <div class="prog-row">
-          <span class="prog-label">📋 Completion</span>
-          <span class="prog-count" id="prog-text">0 / 0</span>
-        </div>
-        <div class="prog-track" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-          <div class="prog-fill" id="prog-fill" style="width:0%"></div>
-        </div>
-        <div class="prog-actions">
-          <button id="btn-expand-all" class="prog-btn">▼ Expand All</button>
-          <button id="btn-collapse-all" class="prog-btn">▶ Collapse All</button>
-        </div>
-      </div>
-
-      <!-- Location tree -->
-      <div id="tree-wrap"></div>
-
-      <!-- Detail card (slides up from bottom of sidebar) -->
-      <div id="detail-card" aria-live="polite">
-        <button id="dc-close" aria-label="Close detail panel">✕</button>
-        <div id="detail-inner">
-          <div id="dc-tag"></div>
-          <div id="dc-title"></div>
-          <div id="dc-char"></div>
-          <div id="dc-desc"></div>
-          <div id="dc-imgs" role="list"></div>
-        </div>
-      </div>
-
-    </aside>
-
-    <!-- ── Map ── -->
-    <main id="map-wrap">
-      <div id="map" aria-label="GTA V San Andreas interactive map"></div>
-
-      <!-- Map overlay controls -->
-      <div id="map-controls">
-        <div id="tile-row" role="group" aria-label="Map style">
-          <button class="mc-btn active" data-t="sat">🛰 Satellite</button>
-          <button class="mc-btn" data-t="road">🛣 Road</button>
-        </div>
-      </div>
-
-      <!-- Live coordinates display -->
-      <div id="coords" aria-live="polite">Hover for coords</div>
-    </main>
-
+  <div>
+    <h1 style="color:#f7c948">GTA V San Andreas Interactive Map</h1>
+    <p style="color:#7a8899">This project has been rebuilt as a React app.</p>
+    <p style="color:#7a8899">See <code>gta5-map.jsx</code> in the repository root.</p>
   </div>
-
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-
-  <!-- App modules (order matters) -->
-  <script src="src/js/data/locations.js"></script>
-  <script src="src/js/data/colors.js"></script>
-  <script src="src/js/data/categories.js"></script>
-  <script src="src/js/storage.js"></script>
-  <script src="src/js/map.js"></script>
-  <script src="src/js/markers.js"></script>
-  <script src="src/js/detail.js"></script>
-  <script src="src/js/tree.js"></script>
-  <script src="src/js/search.js"></script>
-  <script src="src/js/main.js"></script>
 </body>
 </html>
