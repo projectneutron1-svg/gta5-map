@@ -1,20 +1,17 @@
 /**
  * src/js/search.js
  *
- * Handles the search input and results dropdown in the sidebar header.
- * On selection: flies to the location, shows the detail card, and
- * highlights the matching sidebar tree item.
+ * FIXED: Use requestAnimationFrame after expanding the tree parent so
+ * the DOM has settled before scrollIntoView fires, preventing the
+ * scroll landing in the wrong position.
  *
- * Depends on: LOCS, COLORS, EMOJI, flyTo, showDetail
+ * Handles the search input and results dropdown in the sidebar header.
  */
 
 const searchInput   = document.getElementById('search-input');
 const searchResults = document.getElementById('search-results');
 
-/** Maximum number of results shown in the dropdown. */
 const MAX_RESULTS = 14;
-
-// ── Input handler ─────────────────────────────────────────────────────────────
 
 searchInput.addEventListener('input', () => {
   const query = searchInput.value.trim().toLowerCase();
@@ -60,11 +57,10 @@ searchInput.addEventListener('input', () => {
   searchResults.style.display = 'block';
 });
 
-// ── Result selection ──────────────────────────────────────────────────────────
-
 /**
  * Select a result: hide dropdown, fly map, show detail, highlight tree item.
- *
+ * BUG FIX: use requestAnimationFrame after expanding the parent to ensure
+ * the DOM has reflowed before scrollIntoView runs.
  * @param {number} idx – Index into LOCS.
  */
 function selectResult(idx) {
@@ -74,7 +70,6 @@ function selectResult(idx) {
   flyTo(idx);
   showDetail(idx);
 
-  // Highlight and scroll to the matching tree item
   document.querySelectorAll('.tree-item').forEach((el) => el.classList.remove('active'));
 
   const treeItem = document.querySelector(`.tree-item[data-idx="${idx}"]`);
@@ -86,19 +81,20 @@ function selectResult(idx) {
       if (parentHeader) parentHeader.classList.add('open');
     }
     treeItem.classList.add('active');
-    treeItem.scrollIntoView({ block: 'nearest' });
+    // BUG FIX: wait for expand animation before scrolling
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        treeItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      });
+    });
   }
 }
-
-// ── Close dropdown on outside click ──────────────────────────────────────────
 
 document.addEventListener('click', (e) => {
   if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
     searchResults.style.display = 'none';
   }
 });
-
-// ── Close dropdown on Escape ──────────────────────────────────────────────────
 
 searchInput.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
