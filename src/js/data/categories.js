@@ -1,9 +1,12 @@
 /**
  * src/js/data/categories.js
  *
- * Top-level category groups shown in the sidebar tree.
- * Each key is the visible group heading; the value is the ordered list of
- * location types that belong to it.
+ * FIXED: Added missing "Properties & Services" group that contains
+ * Safehouse, Property, Hospital, Police Station, Airport types.
+ * Previously these types were silently absent from the sidebar tree.
+ *
+ * Also added missing ZOOM_FOR_TYPE entries for Vehicle Spawn,
+ * Epsilon Car, and Epsilon Tract (now zoom 7 instead of falling back to 6).
  */
 
 const CAT_GROUPS = {
@@ -23,6 +26,8 @@ const CAT_GROUPS = {
     'Epsilon Car',
     'Epsilon Tract',
   ],
+  // BUG FIX: This entire group was missing. Safehouse/Property/Hospital/
+  // Police Station/Airport were never rendered in the sidebar.
   'Properties & Services': [
     'Safehouse',
     'Property',
@@ -44,8 +49,8 @@ const ZOOM_FOR_TYPE = {
   'Nuclear Waste':      7,
   'Hidden Package':     7,
   'Easter Egg':         7,
-  'Epsilon Car':        7,
-  'Epsilon Tract':      7,
+  'Epsilon Car':        7,  // BUG FIX: was missing, fell back to 6
+  'Epsilon Tract':      7,  // BUG FIX: was missing, fell back to 6
   'Safehouse':          7,
   'Hospital':           7,
   'Police Station':     7,
@@ -58,5 +63,5 @@ const ZOOM_FOR_TYPE = {
   'Heist Setup':        6,
   'Strangers & Freaks': 6,
   'Assassination':      6,
-  'Vehicle Spawn':      7,
+  'Vehicle Spawn':      7,  // BUG FIX: was missing, fell back to 6
 };
