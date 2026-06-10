@@ -2,14 +2,136 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <title>GTA V San Andreas Map – Moved</title>
-  <style>body{font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#0b0f14;color:#e2eaf3;text-align:center}</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>GTA V — San Andreas Interactive Map</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+
+  <!-- App styles (order matters: variables first, then base, then components) -->
+  <link rel="stylesheet" href="src/css/variables.css"/>
+  <link rel="stylesheet" href="src/css/base.css"/>
+  <link rel="stylesheet" href="src/css/map.css"/>
+  <link rel="stylesheet" href="src/css/sidebar.css"/>
+  <link rel="stylesheet" href="src/css/tree.css"/>
+  <link rel="stylesheet" href="src/css/detail-card.css"/>
+  <link rel="stylesheet" href="src/css/leaflet-overrides.css"/>
 </head>
 <body>
-  <div>
-    <h1 style="color:#f7c948">GTA V San Andreas Interactive Map</h1>
-    <p style="color:#7a8899">This project has been rebuilt as a React app.</p>
-    <p style="color:#7a8899">See <code>gta5-map.jsx</code> in the repository root.</p>
-  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       APP SHELL
+       Left sidebar (360 px) + right map panel (flex-1)
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <div id="app">
+
+    <!-- ── SIDEBAR ─────────────────────────────────────────────────────── -->
+    <aside id="sidebar">
+
+      <!-- Header: logo + search -->
+      <div id="sidebar-header">
+        <div id="logo-row">
+          <span id="logo-icon">🗺</span>
+          <div>
+            <div id="logo-title">GTA V</div>
+            <div id="logo-sub">San Andreas Interactive Map</div>
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div id="search-wrap">
+          <span id="search-icon">🔍</span>
+          <input
+            id="search-input"
+            type="search"
+            placeholder="Search locations, missions, collectibles…"
+            autocomplete="off"
+            aria-label="Search locations"
+          />
+          <div id="search-results" role="listbox" aria-label="Search results"></div>
+        </div>
+      </div><!-- /sidebar-header -->
+
+      <!-- Progress -->
+      <div id="progress-wrap">
+        <div id="progress-row">
+          <span id="prog-label">📋 Completion</span>
+          <span id="prog-text">0 / 0</span>
+        </div>
+        <div id="prog-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div id="prog-fill"></div>
+        </div>
+        <div id="expand-row">
+          <button id="btn-expand-all"   class="expand-btn">▼ Expand All</button>
+          <button id="btn-collapse-all" class="expand-btn">▶ Collapse All</button>
+        </div>
+      </div><!-- /progress-wrap -->
+
+      <!-- Category tree (scrollable) -->
+      <div id="tree-wrap"></div>
+
+      <!-- Detail card (slides up from bottom of sidebar) -->
+      <div id="detail-card">
+        <button id="dc-close" aria-label="Close detail">✕</button>
+        <div id="dc-body">
+          <div id="dc-tag"></div>
+          <div id="dc-title"></div>
+          <div id="dc-char"></div>
+          <div id="dc-desc"></div>
+          <div id="dc-imgs" role="list"></div>
+        </div>
+      </div>
+
+    </aside><!-- /sidebar -->
+
+    <!-- ── MAP ──────────────────────────────────────────────────────────── -->
+    <main id="map-wrap">
+      <div id="map"></div>
+
+      <!-- Tile switcher overlay -->
+      <div id="tile-btns">
+        <button class="tile-btn active" data-t="sat">🛰 Satellite</button>
+        <button class="tile-btn"        data-t="road">🛣 Road</button>
+      </div>
+
+      <!-- Coordinate readout -->
+      <div id="coords">Hover for coords</div>
+    </main><!-- /map-wrap -->
+
+  </div><!-- /app -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       SCRIPTS
+       Load order: Leaflet → data → storage → map → markers → detail → tree → search → main
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <!-- Data (no dependencies) -->
+  <script src="src/js/data/colors.js"></script>
+  <script src="src/js/data/categories.js"></script>
+  <script src="src/js/data/locations.js"></script>
+
+  <!-- Storage (depends on nothing) -->
+  <script src="src/js/storage.js"></script>
+
+  <!-- Map (depends on Leaflet) -->
+  <script src="src/js/map.js"></script>
+
+  <!-- Markers (depends on map, data, storage) -->
+  <script src="src/js/markers.js"></script>
+
+  <!-- Detail card (depends on map, markers, data) -->
+  <script src="src/js/detail.js"></script>
+
+  <!-- Sidebar tree (depends on everything above) -->
+  <script src="src/js/tree.js"></script>
+
+  <!-- Search (depends on tree, detail, data) -->
+  <script src="src/js/search.js"></script>
+
+  <!-- Entry point (depends on everything) -->
+  <script src="src/js/main.js"></script>
+
 </body>
 </html>
