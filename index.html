@@ -19,26 +19,19 @@
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       APP SHELL
-       Left sidebar (360 px) + right map panel (flex-1)
-  ══════════════════════════════════════════════════════════════════════════ -->
   <div id="app">
 
-    <!-- ── SIDEBAR ─────────────────────────────────────────────────────── -->
+    <!-- ── SIDEBAR ──────────────────────────────────────────────────────── -->
     <aside id="sidebar">
 
-      <!-- Header: logo + search -->
-      <div id="sidebar-header">
-        <div id="logo-row">
-          <span id="logo-icon">🗺</span>
-          <div>
-            <div id="logo-title">GTA V</div>
-            <div id="logo-sub">San Andreas Interactive Map</div>
-          </div>
+      <!-- Header: logo + search (CSS: #sb-header, #sb-logo) -->
+      <div id="sb-header">
+        <div id="sb-logo">
+          <span class="icon">🗺</span>
+          <h1>GTA V<small>San Andreas Interactive Map</small></h1>
         </div>
 
-        <!-- Search -->
+        <!-- Search (CSS: #search-wrap, #search-icon, #search-input, #search-results) -->
         <div id="search-wrap">
           <span id="search-icon">🔍</span>
           <input
@@ -50,30 +43,30 @@
           />
           <div id="search-results" role="listbox" aria-label="Search results"></div>
         </div>
-      </div><!-- /sidebar-header -->
+      </div>
 
-      <!-- Progress -->
-      <div id="progress-wrap">
-        <div id="progress-row">
-          <span id="prog-label">📋 Completion</span>
-          <span id="prog-text">0 / 0</span>
+      <!-- Progress (CSS: #progress-bar, .prog-row, .prog-label, .prog-count, .prog-track, .prog-fill, .prog-actions, .prog-btn) -->
+      <div id="progress-bar">
+        <div class="prog-row">
+          <span class="prog-label">📋 Completion</span>
+          <span id="prog-text" class="prog-count">0 / 0</span>
         </div>
-        <div id="prog-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <div id="prog-fill"></div>
+        <div class="prog-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div id="prog-fill" class="prog-fill"></div>
         </div>
-        <div id="expand-row">
-          <button id="btn-expand-all"   class="expand-btn">▼ Expand All</button>
-          <button id="btn-collapse-all" class="expand-btn">▶ Collapse All</button>
+        <div class="prog-actions">
+          <button id="btn-expand-all"   class="prog-btn">▼ Expand All</button>
+          <button id="btn-collapse-all" class="prog-btn">▶ Collapse All</button>
         </div>
-      </div><!-- /progress-wrap -->
+      </div>
 
-      <!-- Category tree (scrollable) -->
+      <!-- Category tree (CSS: #tree-wrap) -->
       <div id="tree-wrap"></div>
 
-      <!-- Detail card (slides up from bottom of sidebar) -->
+      <!-- Detail card (CSS: #detail-card, #detail-inner) -->
       <div id="detail-card">
         <button id="dc-close" aria-label="Close detail">✕</button>
-        <div id="dc-body">
+        <div id="detail-inner">
           <div id="dc-tag"></div>
           <div id="dc-title"></div>
           <div id="dc-char"></div>
@@ -82,55 +75,45 @@
         </div>
       </div>
 
-    </aside><!-- /sidebar -->
+    </aside>
 
     <!-- ── MAP ──────────────────────────────────────────────────────────── -->
     <main id="map-wrap">
       <div id="map"></div>
 
-      <!-- Tile switcher overlay -->
-      <div id="tile-btns">
-        <button class="tile-btn active" data-t="sat">🛰 Satellite</button>
-        <button class="tile-btn"        data-t="road">🛣 Road</button>
+      <!-- Tile switcher + controls (CSS: #map-controls, #tile-row, .mc-btn) -->
+      <div id="map-controls">
+        <div id="tile-row">
+          <button class="mc-btn active" data-t="sat">🛰 Satellite</button>
+          <button class="mc-btn"        data-t="road">🛣 Road</button>
+        </div>
       </div>
 
-      <!-- Coordinate readout -->
+      <!-- Coordinate readout (CSS: #coords) -->
       <div id="coords">Hover for coords</div>
-    </main><!-- /map-wrap -->
+    </main>
 
-  </div><!-- /app -->
+  </div>
 
 
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       SCRIPTS
-       Load order: Leaflet → data → storage → map → markers → detail → tree → search → main
-  ══════════════════════════════════════════════════════════════════════════ -->
+  <!-- ═══════════════════════════════════════════════════════════════
+       SCRIPTS — load order: Leaflet → data → storage → map →
+                 markers → detail → tree → search → main
+  ════════════════════════════════════════════════════════════════ -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-  <!-- Data (no dependencies) -->
+  <!-- Data -->
   <script src="src/js/data/colors.js"></script>
   <script src="src/js/data/categories.js"></script>
   <script src="src/js/data/locations.js"></script>
 
-  <!-- Storage (depends on nothing) -->
+  <!-- Core modules -->
   <script src="src/js/storage.js"></script>
-
-  <!-- Map (depends on Leaflet) -->
   <script src="src/js/map.js"></script>
-
-  <!-- Markers (depends on map, data, storage) -->
   <script src="src/js/markers.js"></script>
-
-  <!-- Detail card (depends on map, markers, data) -->
   <script src="src/js/detail.js"></script>
-
-  <!-- Sidebar tree (depends on everything above) -->
   <script src="src/js/tree.js"></script>
-
-  <!-- Search (depends on tree, detail, data) -->
   <script src="src/js/search.js"></script>
-
-  <!-- Entry point (depends on everything) -->
   <script src="src/js/main.js"></script>
 
 </body>
