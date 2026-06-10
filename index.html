@@ -21,14 +21,29 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:-apple-sy
 /* ── LAYOUT ── */
 #app{display:flex;height:100vh;width:100vw;overflow:hidden;background:var(--bg);}
 #sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);height:100%;display:flex;flex-direction:column;background:var(--sidebar);border-right:1px solid var(--border);z-index:10;overflow:hidden;position:relative;flex-shrink:0;}
-/* center-zone removed — map-wrap is now the flex container */
-#map-wrap{flex:1 1 0%;min-width:0;height:100%;display:flex;overflow:hidden;}
-/* the map itself sits in a box that always has a right gap (right panel or dark bg) */
-#map-area{flex:1 1 0%;min-width:0;height:100%;position:relative;overflow:hidden;border-right:1px solid rgba(255,255,255,0.10);}
-#map{position:absolute;inset:0;background:#0a0e14;width:100%;height:100%;}
-/* right zone: always present dark column, panel slides in */
-#right-zone{width:var(--rp-width);min-width:var(--rp-width);height:100%;background:var(--bg);position:relative;flex-shrink:0;transition:width .3s ease,min-width .3s ease;}
-#right-zone.rp-hidden{width:0;min-width:0;overflow:hidden;}
+
+/* Map fills all remaining space — Leaflet owns this completely */
+/* Right padding creates the permanent dark strip seen in screenshot */
+#map-wrap{flex:1 1 0%;min-width:0;height:100%;position:relative;overflow:hidden;background:#0d1117;}
+#map{position:absolute;inset:0;top:0;left:0;right:0;bottom:0;background:#0a0e14;}
+
+/* RIGHT PANEL: fixed overlay, sits on top of the map — Leaflet never knows it exists */
+#right-panel{
+  position:fixed;top:0;right:0;bottom:0;
+  width:var(--rp-width);
+  display:flex;flex-direction:column;
+  background:#0d1117;
+  border-left:1px solid rgba(255,255,255,0.12);
+  z-index:500;
+  overflow:hidden;
+  transition:transform .3s ease, opacity .3s ease;
+  transform:translateX(0);
+}
+#right-panel.rp-hidden{
+  transform:translateX(100%);
+  opacity:0;
+  pointer-events:none;
+}
 
 /* ── SIDEBAR HEADER ── */
 #sb-header{padding:16px;border-bottom:1px solid var(--border);flex-shrink:0;}
@@ -159,23 +174,21 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:-apple-sy
     <div id="tree-wrap"></div>
   </aside>
 
-  <!-- MAP + RIGHT ZONE -->
+  <!-- MAP: fills all remaining space -->
   <div id="map-wrap">
-    <div id="map-area">
-      <div id="map"></div>
-      <div id="coords">Hover for coords</div>
-    </div>
-    <!-- RIGHT ZONE: always occupies its width; panel shows/hides inside it -->
-    <div id="right-zone" class="rp-hidden">
-      <aside id="right-panel" class="rp-hidden">
-        <div id="rp-header">
-          <span id="rp-title">Mission Info</span>
-          <button id="rp-close">✕</button>
-        </div>
-        <div id="rp-body"></div>
-      </aside>
-    </div>
+    <div id="map"></div>
+    <div id="coords">Hover for coords</div>
   </div>
+
+  <!-- RIGHT PANEL: fixed overlay, independent of map -->
+  <aside id="right-panel" class="rp-hidden">
+    <div id="rp-header">
+      <span id="rp-title">Mission Info</span>
+      <button id="rp-close">✕</button>
+    </div>
+    <div id="rp-body"></div>
+  </aside>
+
   <!-- Tile toggle: fixed top-right, always visible -->
   <div id="map-controls">
     <div id="tile-row">
@@ -952,7 +965,6 @@ CARDS['The Paleto Score'] = `<div style="padding:1.5rem 0;">
 // 7. RIGHT PANEL
 // ════════════════════════════════════════════════════════════
 const rightPanel = document.getElementById('right-panel');
-const rightZone  = document.getElementById('right-zone');
 const rpBody     = document.getElementById('rp-body');
 const rpClose    = document.getElementById('rp-close');
 const rpTitle    = document.getElementById('rp-title');
@@ -961,7 +973,6 @@ function openRightPanel(idx) {
   const loc  = LOCS[idx];
   const card = CARDS[loc.title];
   rpTitle.textContent = loc.title;
-  rightZone.classList.remove('rp-hidden');
   rightPanel.classList.remove('rp-hidden');
   if (card) {
     rpBody.innerHTML = card;
@@ -986,14 +997,18 @@ function openRightPanel(idx) {
         </div>
       </div>`;
   }
-  setTimeout(() => map.invalidateSize(), 310);
+  // Shift Leaflet's usable area left so markers aren't hidden under the panel
+  setTimeout(() => {
+    map.invalidateSize({ pan: false });
+  }, 310);
 }
 
 function closeRightPanel() {
-  rightZone.classList.add('rp-hidden');
   rightPanel.classList.add('rp-hidden');
   rpBody.innerHTML = '';
-  setTimeout(() => map.invalidateSize(), 310);
+  setTimeout(() => {
+    map.invalidateSize({ pan: false });
+  }, 310);
 }
 
 rpClose.addEventListener('click', closeRightPanel);
