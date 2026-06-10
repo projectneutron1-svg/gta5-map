@@ -23,9 +23,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:-apple-sy
 #sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);height:100%;display:flex;flex-direction:column;background:var(--sidebar);border-right:1px solid var(--border);z-index:10;overflow:hidden;position:relative;flex-shrink:0;}
 
 /* Map fills all remaining space — Leaflet owns this completely */
-/* Right padding creates the permanent dark strip seen in screenshot */
-#map-wrap{flex:1 1 0%;min-width:0;height:100%;position:relative;overflow:hidden;background:#0d1117;}
-#map{position:absolute;inset:0;top:0;left:0;right:0;bottom:0;background:#0a0e14;}
+#map-wrap{flex:1 1 0%;min-width:0;height:100%;position:relative;overflow:hidden;background:var(--bg);}
+#map{position:absolute;inset:0;background:var(--bg);}
 
 /* RIGHT PANEL: fixed overlay, sits on top of the map — Leaflet never knows it exists */
 #right-panel{
@@ -142,7 +141,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:-apple-sy
 .lpu-hint{font-size:10px;color:var(--muted);}
 .type-row{display:flex;align-items:center;padding:4px 16px;gap:8px;}
 /* Ensure Leaflet's own container fills the #map div completely */
-.leaflet-container{width:100%!important;height:100%!important;}
+.leaflet-container{width:100%!important;height:100%!important;background:var(--bg)!important;}
   </style>
 </head>
 <body>
@@ -732,7 +731,9 @@ const tSat  = L.tileLayer(`${TILE_BASE}/satellite/{z}-{x}_{y}.png`, { tileSize:2
 const tRoad = L.tileLayer(`${TILE_BASE}/road/{z}-{x}_{y}.png`,      { tileSize:256,maxZoom:7,minZoom:3,noWrap:true,bounds:MAP_BOUNDS,attribution:'© GTA V tiles' });
 tSat.addTo(map);
 let activeTile = 'sat';
-map.setView([70, -119], 4);
+// Fit the full tile bounds with a small padding so the map fills the container
+// with just a thin dark border — matching the reference screenshot
+map.fitBounds(MAP_BOUNDS, { padding: [8, 8] });
 
 document.querySelectorAll('[data-t]').forEach(btn => {
   btn.addEventListener('click', () => {
