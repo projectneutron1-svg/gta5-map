@@ -19,11 +19,16 @@
 html,body{height:100%;overflow:hidden;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--text);}
 
 /* ── LAYOUT ── */
-#app{display:flex;height:100vh;width:100vw;overflow:hidden;}
+#app{display:flex;height:100vh;width:100vw;overflow:hidden;background:var(--bg);}
 #sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);height:100%;display:flex;flex-direction:column;background:var(--sidebar);border-right:1px solid var(--border);z-index:10;overflow:hidden;position:relative;flex-shrink:0;}
-/* map-wrap: takes only the space between sidebar and right panel — never bleeds under either panel */
-#map-wrap{flex:1 1 0%;min-width:0;height:100%;position:relative;overflow:hidden;isolation:isolate;}
+/* center-zone removed — map-wrap is now the flex container */
+#map-wrap{flex:1 1 0%;min-width:0;height:100%;display:flex;overflow:hidden;}
+/* the map itself sits in a box that always has a right gap (right panel or dark bg) */
+#map-area{flex:1 1 0%;min-width:0;height:100%;position:relative;overflow:hidden;border-right:1px solid rgba(255,255,255,0.10);}
 #map{position:absolute;inset:0;background:#0a0e14;width:100%;height:100%;}
+/* right zone: always present dark column, panel slides in */
+#right-zone{width:var(--rp-width);min-width:var(--rp-width);height:100%;background:var(--bg);position:relative;flex-shrink:0;transition:width .3s ease,min-width .3s ease;}
+#right-zone.rp-hidden{width:0;min-width:0;overflow:hidden;}
 
 /* ── SIDEBAR HEADER ── */
 #sb-header{padding:16px;border-bottom:1px solid var(--border);flex-shrink:0;}
@@ -87,16 +92,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:-apple-sy
 /* detail card removed – right panel handles all location details */
 
 /* ── MAP CONTROLS ── */
-#map-controls{position:absolute;top:12px;right:12px;z-index:1000;display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
-.mc-btn{height:32px;padding:0 12px;background:rgba(10,12,16,0.92);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;backdrop-filter:blur(10px);}
+/* Tile toggle: fixed top-right of the viewport, always visible */
+#map-controls{position:fixed;top:12px;right:12px;z-index:2000;display:flex;gap:5px;align-items:center;}
+.mc-btn{height:32px;padding:0 14px;background:rgba(18,20,26,0.96);border:1px solid rgba(255,255,255,0.13);border-radius:8px;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;backdrop-filter:blur(12px);}
 .mc-btn:hover{background:rgba(255,255,255,.08);}
-.mc-btn.active{background:rgba(247,201,72,.12);border-color:rgba(247,201,72,.3);color:var(--accent);}
+.mc-btn.active{background:rgba(247,201,72,.15);border-color:rgba(247,201,72,.4);color:var(--accent);}
 #tile-row{display:flex;gap:5px;}
 #coords{position:absolute;bottom:8px;right:8px;z-index:1000;background:rgba(10,12,16,0.88);border:1px solid var(--border);border-radius:7px;padding:4px 10px;font-size:10px;font-family:monospace;color:var(--muted);pointer-events:none;}
 
 /* ── RIGHT PANEL ── */
-#right-panel{width:var(--rp-width);min-width:var(--rp-width);height:100%;display:flex;flex-direction:column;background:#0d1117;border-left:1px solid rgba(255,255,255,0.12);z-index:10;overflow:hidden;transition:width .3s ease,min-width .3s ease,opacity .25s ease;flex-shrink:0;position:relative;}
-#right-panel.rp-hidden{width:0!important;min-width:0!important;opacity:0;pointer-events:none;border:none;overflow:hidden;}
+#right-panel{width:100%;height:100%;display:flex;flex-direction:column;background:#0d1117;border-left:1px solid rgba(255,255,255,0.10);z-index:10;overflow:hidden;transition:opacity .25s ease;flex-shrink:0;position:relative;}
+#right-panel.rp-hidden{opacity:0;pointer-events:none;visibility:hidden;}
 #rp-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
 #rp-title{font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);}
 #rp-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;transition:background .15s,color .15s;}
@@ -153,26 +159,30 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:-apple-sy
     <div id="tree-wrap"></div>
   </aside>
 
-  <!-- MAP -->
-  <main id="map-wrap">
-    <div id="map"></div>
-    <div id="map-controls">
-      <div id="tile-row">
-        <button class="mc-btn active" data-t="sat">🛰 Satellite</button>
-        <button class="mc-btn" data-t="road">🛣 Road</button>
-      </div>
+  <!-- MAP + RIGHT ZONE -->
+  <div id="map-wrap">
+    <div id="map-area">
+      <div id="map"></div>
+      <div id="coords">Hover for coords</div>
     </div>
-    <div id="coords">Hover for coords</div>
-  </main>
-
-  <!-- RIGHT PANEL -->
-  <aside id="right-panel" class="rp-hidden">
-    <div id="rp-header">
-      <span id="rp-title">Mission Info</span>
-      <button id="rp-close">✕</button>
+    <!-- RIGHT ZONE: always occupies its width; panel shows/hides inside it -->
+    <div id="right-zone" class="rp-hidden">
+      <aside id="right-panel" class="rp-hidden">
+        <div id="rp-header">
+          <span id="rp-title">Mission Info</span>
+          <button id="rp-close">✕</button>
+        </div>
+        <div id="rp-body"></div>
+      </aside>
     </div>
-    <div id="rp-body"></div>
-  </aside>
+  </div>
+  <!-- Tile toggle: fixed top-right, always visible -->
+  <div id="map-controls">
+    <div id="tile-row">
+      <button class="mc-btn active" data-t="sat">🛰 Satellite</button>
+      <button class="mc-btn" data-t="road">🛣 Road</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -942,6 +952,7 @@ CARDS['The Paleto Score'] = `<div style="padding:1.5rem 0;">
 // 7. RIGHT PANEL
 // ════════════════════════════════════════════════════════════
 const rightPanel = document.getElementById('right-panel');
+const rightZone  = document.getElementById('right-zone');
 const rpBody     = document.getElementById('rp-body');
 const rpClose    = document.getElementById('rp-close');
 const rpTitle    = document.getElementById('rp-title');
@@ -950,6 +961,7 @@ function openRightPanel(idx) {
   const loc  = LOCS[idx];
   const card = CARDS[loc.title];
   rpTitle.textContent = loc.title;
+  rightZone.classList.remove('rp-hidden');
   rightPanel.classList.remove('rp-hidden');
   if (card) {
     rpBody.innerHTML = card;
@@ -978,6 +990,7 @@ function openRightPanel(idx) {
 }
 
 function closeRightPanel() {
+  rightZone.classList.add('rp-hidden');
   rightPanel.classList.add('rp-hidden');
   rpBody.innerHTML = '';
   setTimeout(() => map.invalidateSize(), 310);
