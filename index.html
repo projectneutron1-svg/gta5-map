@@ -731,9 +731,12 @@ const tSat  = L.tileLayer(`${TILE_BASE}/satellite/{z}-{x}_{y}.png`, { tileSize:2
 const tRoad = L.tileLayer(`${TILE_BASE}/road/{z}-{x}_{y}.png`,      { tileSize:256,maxZoom:7,minZoom:3,noWrap:true,bounds:MAP_BOUNDS,attribution:'© GTA V tiles' });
 tSat.addTo(map);
 let activeTile = 'sat';
-// Fit the full tile bounds with a small padding so the map fills the container
-// with just a thin dark border — matching the reference screenshot
-map.fitBounds(MAP_BOUNDS, { padding: [8, 8] });
+map.setView([71, -122], 3);
+// After layout settles, fit the tile bounds with a small padding for thin borders
+setTimeout(() => {
+  map.invalidateSize();
+  map.fitBounds(MAP_BOUNDS, { padding: [8, 8] });
+}, 100);
 
 document.querySelectorAll('[data-t]').forEach(btn => {
   btn.addEventListener('click', () => {
