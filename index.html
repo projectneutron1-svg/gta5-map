@@ -4,48 +4,37 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>GTA V — San Andreas Interactive Map</title>
-
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-
-  <!-- App styles (order matters: variables first, then base, then components) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"/>
   <link rel="stylesheet" href="src/css/variables.css"/>
   <link rel="stylesheet" href="src/css/base.css"/>
   <link rel="stylesheet" href="src/css/map.css"/>
   <link rel="stylesheet" href="src/css/sidebar.css"/>
   <link rel="stylesheet" href="src/css/tree.css"/>
   <link rel="stylesheet" href="src/css/detail-card.css"/>
+  <link rel="stylesheet" href="src/css/right-panel.css"/>
   <link rel="stylesheet" href="src/css/leaflet-overrides.css"/>
 </head>
 <body>
 
   <div id="app">
 
-    <!-- ── SIDEBAR ──────────────────────────────────────────────────────── -->
+    <!-- ── LEFT SIDEBAR ─────────────────────────────────────────────────── -->
     <aside id="sidebar">
-
-      <!-- Header: logo + search (CSS: #sb-header, #sb-logo) -->
       <div id="sb-header">
         <div id="sb-logo">
           <span class="icon">🗺</span>
           <h1>GTA V<small>San Andreas Interactive Map</small></h1>
         </div>
-
-        <!-- Search (CSS: #search-wrap, #search-icon, #search-input, #search-results) -->
         <div id="search-wrap">
           <span id="search-icon">🔍</span>
-          <input
-            id="search-input"
-            type="search"
+          <input id="search-input" type="search"
             placeholder="Search locations, missions, collectibles…"
-            autocomplete="off"
-            aria-label="Search locations"
-          />
+            autocomplete="off" aria-label="Search locations"/>
           <div id="search-results" role="listbox" aria-label="Search results"></div>
         </div>
       </div>
 
-      <!-- Progress (CSS: #progress-bar, .prog-row, .prog-label, .prog-count, .prog-track, .prog-fill, .prog-actions, .prog-btn) -->
       <div id="progress-bar">
         <div class="prog-row">
           <span class="prog-label">📋 Completion</span>
@@ -60,10 +49,8 @@
         </div>
       </div>
 
-      <!-- Category tree (CSS: #tree-wrap) -->
       <div id="tree-wrap"></div>
 
-      <!-- Detail card (CSS: #detail-card, #detail-inner) -->
       <div id="detail-card">
         <button id="dc-close" aria-label="Close detail">✕</button>
         <div id="detail-inner">
@@ -74,47 +61,45 @@
           <div id="dc-imgs" role="list"></div>
         </div>
       </div>
-
     </aside>
 
     <!-- ── MAP ──────────────────────────────────────────────────────────── -->
     <main id="map-wrap">
       <div id="map"></div>
-
-      <!-- Tile switcher + controls (CSS: #map-controls, #tile-row, .mc-btn) -->
       <div id="map-controls">
         <div id="tile-row">
           <button class="mc-btn active" data-t="sat">🛰 Satellite</button>
           <button class="mc-btn"        data-t="road">🛣 Road</button>
         </div>
       </div>
-
-      <!-- Coordinate readout (CSS: #coords) -->
       <div id="coords">Hover for coords</div>
     </main>
 
+    <!-- ── RIGHT INFO PANEL ──────────────────────────────────────────────── -->
+    <aside id="right-panel" class="rp-hidden">
+      <div id="rp-header">
+        <span id="rp-title">Mission Info</span>
+        <button id="rp-close" aria-label="Close panel">✕</button>
+      </div>
+      <div id="rp-body">
+        <!-- card content injected here -->
+      </div>
+    </aside>
+
   </div>
 
-
-  <!-- ═══════════════════════════════════════════════════════════════
-       SCRIPTS — load order: Leaflet → data → storage → map →
-                 markers → detail → tree → search → main
-  ════════════════════════════════════════════════════════════════ -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-
-  <!-- Data -->
-  <script src="src/js/data/colors.js"></script>
-  <script src="src/js/data/categories.js"></script>
   <script src="src/js/data/locations.js"></script>
-
-  <!-- Core modules -->
+  <script src="src/js/data/categories.js"></script>
+  <script src="src/js/data/colors.js"></script>
+  <script src="src/js/data/cards.js"></script>
   <script src="src/js/storage.js"></script>
   <script src="src/js/map.js"></script>
   <script src="src/js/markers.js"></script>
+  <script src="src/js/right-panel.js"></script>
   <script src="src/js/detail.js"></script>
   <script src="src/js/tree.js"></script>
   <script src="src/js/search.js"></script>
   <script src="src/js/main.js"></script>
-
 </body>
 </html>
