@@ -1,18 +1,16 @@
 /**
  * src/js/detail.js
  *
- * FIXED: Clear pending popup timer before setting a new one to prevent
- * race condition where a stale popup opens on top of a new selection.
+ * Controls the sliding detail card at the bottom of the sidebar,
+ * and triggers the right panel for rich mission cards.
  *
- * Controls the sliding detail card at the bottom of the sidebar.
- * Exposes `showDetail` and `flyTo` for use by tree.js and search.js.
- *
- * Depends on: map, LOCS, EMOJI, getMissionColor, markerMap, ZOOM_FOR_TYPE
+ * Depends on: map, LOCS, EMOJI, getMissionColor, markerMap,
+ *             ZOOM_FOR_TYPE, openRightPanel
  */
 
-const detailCard  = document.getElementById('detail-card');
-const treeWrap    = document.getElementById('tree-wrap');
-const dcClose     = document.getElementById('dc-close');
+const detailCard = document.getElementById('detail-card');
+const treeWrapEl = document.getElementById('tree-wrap');
+const dcClose    = document.getElementById('dc-close');
 
 const dcTag   = document.getElementById('dc-tag');
 const dcTitle = document.getElementById('dc-title');
@@ -20,29 +18,22 @@ const dcChar  = document.getElementById('dc-char');
 const dcDesc  = document.getElementById('dc-desc');
 const dcImgs  = document.getElementById('dc-imgs');
 
-// BUG FIX: track the popup timer so we can cancel it before opening a new one
 let _popupTimer = null;
 
-/**
- * Fly the map to a location and zoom to the appropriate level.
- * @param {number} idx – Index into LOCS.
- */
+/** Fly the map to a location. */
 function flyTo(idx) {
   const loc  = LOCS[idx];
   const zoom = ZOOM_FOR_TYPE[loc.type] || 6;
   map.flyTo([loc.lat, loc.lng], zoom, { duration: 0.8 });
 }
 
-/**
- * Populate and reveal the detail card for the given location.
- * Also opens the Leaflet popup after the fly animation completes.
- * @param {number} idx – Index into LOCS.
- */
+/** Populate sidebar detail card + open right panel. */
 function showDetail(idx) {
   const loc    = LOCS[idx];
   const colour = getMissionColor(loc);
 
-  dcTag.innerHTML  = `<span style="color:${colour}">${EMOJI[loc.type] || '📍'} ${loc.type}</span>`;
+  // Sidebar bottom card (quick summary)
+  dcTag.innerHTML     = `<span style="color:${colour}">${EMOJI[loc.type] || '📍'} ${loc.type}</span>`;
   dcTitle.textContent = loc.title;
 
   if (loc.char) {
@@ -59,8 +50,8 @@ function showDetail(idx) {
   if (loc.imgs && loc.imgs.length) {
     loc.imgs.forEach((url) => {
       const img = document.createElement('img');
-      img.src  = url;
-      img.alt  = loc.title;
+      img.src = url;
+      img.alt = loc.title;
       img.role = 'listitem';
       img.addEventListener('error', () => { img.style.display = 'none'; });
       dcImgs.appendChild(img);
@@ -68,9 +59,11 @@ function showDetail(idx) {
   }
 
   detailCard.classList.add('visible');
-  treeWrap.classList.add('card-open');
+  treeWrapEl.classList.add('card-open');
 
-  // BUG FIX: clear any pending popup timer before setting a new one
+  // Right panel — rich card or structured fallback
+  openRightPanel(idx);
+
   if (_popupTimer) clearTimeout(_popupTimer);
   _popupTimer = setTimeout(() => {
     const marker = markerMap.get(idx);
@@ -79,10 +72,10 @@ function showDetail(idx) {
   }, 850);
 }
 
-/** Close the detail card and clean up active tree highlighting. */
+/** Close sidebar detail card. Does NOT close right panel (user controls that). */
 function closeDetail() {
   detailCard.classList.remove('visible');
-  treeWrap.classList.remove('card-open');
+  treeWrapEl.classList.remove('card-open');
   document.querySelectorAll('.tree-item').forEach((el) => el.classList.remove('active'));
   if (_popupTimer) { clearTimeout(_popupTimer); _popupTimer = null; }
 }
