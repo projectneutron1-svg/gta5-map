@@ -1,42 +1,47 @@
-/* ──────────────────────────────────────────────────────────────────────────────
-   base.css  –  CSS reset and top-level layout.
-   ────────────────────────────────────────────────────────────────────────────── */
+/* ── CSS reset ── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-*,
-*::before,
-*::after {
-  margin:     0;
-  padding:    0;
-  box-sizing: border-box;
-}
-
-html,
-body {
-  height:     100%;
-  overflow:   hidden;
+html, body {
+  height: 100%;
+  overflow: hidden;
   background: var(--bg);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color:      var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
 }
 
-/* ── Root app layout: sidebar | map | right-panel ── */
+/* ── Root: three columns, full viewport, zero gaps ── */
 #app {
   display: flex;
   height:  100vh;
   width:   100vw;
   overflow: hidden;
+  /* no gap, no padding — columns touch each other */
 }
 
-/* ── Map wrapper fills all remaining space between the two sidebars ── */
+/* ── Left sidebar — fixed width, rigid ── */
+#sidebar {
+  flex: 0 0 var(--sidebar-w);
+  width: var(--sidebar-w);
+  height: 100%;
+}
+
+/* ── Map column — grows to fill everything between the two sidebars ── */
 #map-wrap {
-  flex:     1 1 0%;
-  min-width: 0;        /* prevent flex overflow */
+  flex: 1 1 0%;
+  min-width: 0;
   position: relative;
-  overflow: hidden;
+  overflow: hidden;  /* tiles CANNOT overflow this box */
+  /* clip everything: tiles, popups, controls stay inside */
+  clip-path: none;
 }
 
 #map {
-  width:      100%;
-  height:     100%;
+  position: absolute;
+  inset: 0;          /* top/right/bottom/left all 0 — fills parent exactly */
   background: #0a0e14;
+}
+
+/* ── Right panel — slides in, zero-width when hidden ── */
+#right-panel {
+  flex: 0 0 auto;
 }
