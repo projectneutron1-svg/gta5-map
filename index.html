@@ -1,839 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>GTA V – San Andreas Interactive Map</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-<style>
-:root{
-  --bg:#0d1117;--sidebar:#0d1117;--panel:#161b22;--border:rgba(255,255,255,0.07);
-  --text:#e6edf3;--muted:#8b949e;--accent:#f7c948;--hover:rgba(255,255,255,0.04);
-  --radius:10px;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;overflow:hidden;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--text);}
-#app{display:flex;height:100vh;}
-#sidebar{width:360px;min-width:360px;height:100%;display:flex;flex-direction:column;background:var(--sidebar);border-right:1px solid var(--border);z-index:10;overflow:hidden;position:relative;}
-#map-wrap{flex:1;position:relative;overflow:hidden;}
-#map{width:100%;height:100%;background:#0a0e14;}
-#sb-header{padding:16px;border-bottom:1px solid var(--border);flex-shrink:0;}
-#sb-logo{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
-#sb-logo .icon{font-size:22px;}
-#sb-logo h1{font-size:15px;font-weight:800;letter-spacing:.3px;color:var(--accent);}
-#sb-logo h1 small{display:block;font-size:11px;font-weight:400;color:var(--muted);letter-spacing:0;}
-#search-wrap{position:relative;}
-#search-input{width:100%;height:36px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:0 12px 0 34px;outline:none;transition:border-color .2s;}
-#search-input:focus{border-color:rgba(247,201,72,.4);}
-#search-input::placeholder{color:var(--muted);}
-#search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--muted);pointer-events:none;}
-#search-results{display:none;margin-top:8px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-height:220px;overflow-y:auto;}
-#search-results::-webkit-scrollbar{width:3px;}
-#search-results::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
-.sr-item{padding:9px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);transition:background .1s;}
-.sr-item:last-child{border:none;}
-.sr-item:hover{background:rgba(255,255,255,.06);}
-.sr-name{font-size:12px;font-weight:600;color:var(--text);}
-.sr-meta{font-size:10px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:4px;}
-.sr-dot{width:6px;height:6px;border-radius:50%;display:inline-block;}
-#progress-bar{padding:10px 16px 8px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.prog-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
-.prog-label{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
-.prog-count{font-size:11px;color:var(--accent);font-weight:700;}
-.prog-track{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;}
-.prog-fill{height:100%;background:linear-gradient(90deg,#f7c948,#fb923c);border-radius:2px;transition:width .4s ease;}
-#tree-wrap{flex:1;overflow-y:auto;padding:8px 0;transition:padding-bottom .3s ease;}
-#tree-wrap.card-open{padding-bottom:200px;}
-#tree-wrap::-webkit-scrollbar{width:3px;}
-#tree-wrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px;}
-.tree-cat{margin-bottom:2px;}
-.tree-cat-header{display:flex;align-items:center;padding:8px 16px;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.3px;transition:background .12s;user-select:none;gap:8px;}
-.tree-cat-header:hover{background:rgba(255,255,255,.04);}
-.tree-cat-header .cat-arrow{margin-left:auto;font-size:10px;color:var(--muted);transition:transform .2s;transform:rotate(0deg);}
-.tree-cat-header.open .cat-arrow{transform:rotate(90deg);}
-.tree-cat-header .cat-check{width:15px;height:15px;border-radius:4px;border:1.5px solid rgba(255,255,255,.2);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;}
-.tree-cat-header .cat-check.checked{border-color:currentColor;background:currentColor;}
-.tree-cat-header .cat-check.checked::after{content:'✓';font-size:9px;color:#000;font-weight:900;}
-.cat-count{font-size:10px;color:var(--muted);font-weight:400;margin-left:4px;}
-.tree-items{display:none;padding:0 0 4px 0;}
-.tree-items.open{display:block;}
-.tree-item{display:flex;align-items:center;padding:6px 16px 6px 40px;cursor:pointer;font-size:12px;color:var(--muted);transition:all .1s;gap:8px;border-left:2px solid transparent;}
-.tree-item:hover{background:var(--hover);color:var(--text);border-left-color:rgba(255,255,255,.15);}
-.tree-item.active{background:rgba(255,255,255,.06);color:var(--text);}
-.tree-item .item-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.tree-item .item-name{flex:1;line-height:1.3;}
-.item-done{width:13px;height:13px;border-radius:3px;border:1.5px solid rgba(255,255,255,.15);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-left:auto;}
-.item-done:hover{border-color:rgba(52,211,153,.5);}
-.item-done.checked{background:#34d399;border-color:#34d399;}
-.item-done.checked::after{content:'✓';font-size:7px;color:#000;font-weight:900;}
-#detail-card{position:absolute;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);overflow:hidden;transition:max-height .3s ease,opacity .3s ease;opacity:0;max-height:0;flex-shrink:0;z-index:20;}
-#detail-card.visible{opacity:1;max-height:360px;}
-#detail-inner{padding:14px 16px 14px;overflow-y:auto;max-height:320px;}
-#detail-inner::-webkit-scrollbar{width:3px;}
-#detail-inner::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
-#dc-close{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;z-index:21;padding:2px 6px;border-radius:4px;}
-#dc-close:hover{background:rgba(255,255,255,.08);color:var(--text);}
-#dc-tag{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;margin-bottom:6px;}
-#dc-title{font-size:14px;font-weight:800;margin-bottom:6px;line-height:1.3;}
-#dc-char{font-size:11px;color:var(--accent);font-weight:600;margin-bottom:8px;}
-#dc-desc{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:12px;}
-#dc-imgs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;}
-#dc-imgs::-webkit-scrollbar{height:3px;}
-#dc-imgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
-#dc-imgs img{height:90px;border-radius:8px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);}
-#dc-imgs img:hover{transform:scale(1.02);transition:transform .2s;}
-#map-controls{position:absolute;top:12px;right:12px;z-index:1000;display:flex;flex-direction:column;gap:6px;align-items:flex-end;}
-.mc-btn{height:32px;padding:0 12px;background:rgba(10,12,16,0.92);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;backdrop-filter:blur(10px);}
-.mc-btn:hover{background:rgba(255,255,255,.08);}
-.mc-btn.active{background:rgba(247,201,72,.12);border-color:rgba(247,201,72,.3);color:var(--accent);}
-#tile-row{display:flex;gap:5px;}
-#coords{position:absolute;bottom:8px;right:8px;z-index:1000;background:rgba(10,12,16,0.88);border:1px solid var(--border);border-radius:7px;padding:4px 10px;font-size:10px;font-family:monospace;color:var(--muted);pointer-events:none;}
-.leaflet-control-zoom{border:1px solid var(--border)!important;border-radius:8px!important;overflow:hidden;}
-.leaflet-control-zoom a{background:rgba(10,12,16,.92)!important;color:#c9d1d9!important;border-bottom:1px solid var(--border)!important;width:30px!important;height:30px!important;line-height:30px!important;}
-.leaflet-control-zoom a:hover{background:rgba(255,255,255,.1)!important;}
-.leaflet-control-attribution{background:rgba(10,12,16,.7)!important;color:#444!important;font-size:9px!important;}
-.leaflet-popup-content-wrapper{background:#161b22!important;border:1px solid var(--border)!important;border-radius:12px!important;padding:0!important;box-shadow:0 8px 32px rgba(0,0,0,.6)!important;min-width:180px;}
-.leaflet-popup-tip{background:#161b22!important;}
-.leaflet-popup-content{margin:0!important;color:var(--text)!important;}
-.leaflet-popup-close-button{color:var(--muted)!important;top:8px!important;right:8px!important;font-size:16px!important;}
-.lpu{padding:12px 14px;}
-.lpu-tag{font-size:9px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;margin-bottom:5px;}
-.lpu-title{font-size:12px;font-weight:700;line-height:1.35;margin-bottom:4px;}
-.lpu-char{font-size:10px;color:var(--accent);margin-bottom:3px;}
-.lpu-hint{font-size:10px;color:var(--muted);}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GTA V – San Andreas Interactive Map</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="src/css/variables.css" />
+  <link rel="stylesheet" href="src/css/base.css" />
+  <link rel="stylesheet" href="src/css/sidebar.css" />
+  <link rel="stylesheet" href="src/css/tree.css" />
+  <link rel="stylesheet" href="src/css/detail-card.css" />
+  <link rel="stylesheet" href="src/css/map.css" />
+  <link rel="stylesheet" href="src/css/leaflet-overrides.css" />
 </head>
 <body>
-<div id="app">
-  <div id="sidebar">
-    <div id="sb-header">
-      <div id="sb-logo">
-        <span class="icon">🗺</span>
-        <h1>GTA V<small>San Andreas Interactive Map</small></h1>
+  <div id="app">
+
+    <!-- ── Sidebar ── -->
+    <aside id="sidebar">
+
+      <!-- Header: logo + search -->
+      <div id="sb-header">
+        <div id="sb-logo">
+          <span class="icon" aria-hidden="true">🗺</span>
+          <h1>GTA V <small>San Andreas Interactive Map</small></h1>
+        </div>
+        <div id="search-wrap">
+          <span id="search-icon" aria-hidden="true">🔍</span>
+          <input
+            id="search-input"
+            type="search"
+            placeholder="Search locations, missions, collectibles…"
+            autocomplete="off"
+            aria-label="Search map locations"
+          />
+        </div>
+        <div id="search-results" role="listbox" aria-label="Search results"></div>
       </div>
-      <div id="search-wrap">
-        <span id="search-icon">🔍</span>
-        <input id="search-input" placeholder="Search locations, missions, collectibles…" autocomplete="off"/>
+
+      <!-- Progress bar -->
+      <div id="progress-bar">
+        <div class="prog-row">
+          <span class="prog-label">📋 Completion</span>
+          <span class="prog-count" id="prog-text">0 / 0</span>
+        </div>
+        <div class="prog-track" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+          <div class="prog-fill" id="prog-fill" style="width:0%"></div>
+        </div>
+        <div class="prog-actions">
+          <button id="btn-expand-all" class="prog-btn">▼ Expand All</button>
+          <button id="btn-collapse-all" class="prog-btn">▶ Collapse All</button>
+        </div>
       </div>
-      <div id="search-results"></div>
-    </div>
-    <div id="progress-bar">
-      <div class="prog-row"><span class="prog-label">📋 Completion</span><span class="prog-count" id="prog-text">0 / 0</span></div>
-      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
-      <div style="display:flex;gap:6px;margin-top:8px;">
-        <button id="btn-expand-all" style="flex:1;height:24px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:10px;font-weight:600;cursor:pointer;letter-spacing:.3px;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.09)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">▼ Expand All</button>
-        <button id="btn-collapse-all" style="flex:1;height:24px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:10px;font-weight:600;cursor:pointer;letter-spacing:.3px;transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.09)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">▶ Collapse All</button>
+
+      <!-- Location tree -->
+      <div id="tree-wrap"></div>
+
+      <!-- Detail card (slides up from bottom of sidebar) -->
+      <div id="detail-card" aria-live="polite">
+        <button id="dc-close" aria-label="Close detail panel">✕</button>
+        <div id="detail-inner">
+          <div id="dc-tag"></div>
+          <div id="dc-title"></div>
+          <div id="dc-char"></div>
+          <div id="dc-desc"></div>
+          <div id="dc-imgs" role="list"></div>
+        </div>
       </div>
-    </div>
-    <div id="tree-wrap"></div>
-    <div id="detail-card">
-      <button id="dc-close">✕</button>
-      <div id="detail-inner">
-        <div id="dc-tag"></div>
-        <div id="dc-title"></div>
-        <div id="dc-char"></div>
-        <div id="dc-desc"></div>
-        <div id="dc-imgs"></div>
+
+    </aside>
+
+    <!-- ── Map ── -->
+    <main id="map-wrap">
+      <div id="map" aria-label="GTA V San Andreas interactive map"></div>
+
+      <!-- Map overlay controls -->
+      <div id="map-controls">
+        <div id="tile-row" role="group" aria-label="Map style">
+          <button class="mc-btn active" data-t="sat">🛰 Satellite</button>
+          <button class="mc-btn" data-t="road">🛣 Road</button>
+        </div>
       </div>
-    </div>
+
+      <!-- Live coordinates display -->
+      <div id="coords" aria-live="polite">Hover for coords</div>
+    </main>
+
   </div>
-  <div id="map-wrap">
-    <div id="map"></div>
-    <div id="map-controls">
-      <div id="tile-row">
-        <button class="mc-btn active" data-t="sat">🛰 Satellite</button>
-        <button class="mc-btn" data-t="road">🛣 Road</button>
-      </div>
-    </div>
-    <div id="coords">Hover for coords</div>
-  </div>
-</div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script>
-// ─────────────────────────────────────────────────────────────────────────────
-// LOCATION DATA — corrected coordinates based on the GTA V tile system used by
-// gta5-map.github.io tiles.  The tile set uses standard Web Mercator projection
-// where the San Andreas landmass sits roughly in lat [54..88], lng [-160..-85].
-// Key reference calibration points cross-checked with gta5map.com / GTABase:
-//   Los Santos City Centre ≈ lat 67, lng -119
-//   Sandy Shores ≈ lat 75, lng -107
-//   Paleto Bay ≈ lat 83, lng -135
-//   Mount Chiliad peak ≈ lat 78, lng -115
-//   Fort Zancudo ≈ lat 76, lng -129
-//   LSIA (airport) ≈ lat 62, lng -120
-// ─────────────────────────────────────────────────────────────────────────────
-const LOCS = [
-{type:"Main Mission",cat:"Story",title:"Prologue – Ludendorff",lat:53.93,lng:-79.49,char:"M/T/B",desc:"Michael, Trevor and Brad rob the Ludendorff bank in North Yankton. 9 years before the main story.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Franklin and Lamar",lat:65.06,lng:-114.17,char:"F/L",desc:"Franklin and Lamar repo two luxury cars from Simeon lot in South LS.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Repossession",lat:64.92,lng:-113.7,char:"F",desc:"Franklin repos a Bagger motorcycle from the Vagos in Chamberlain Hills.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Complications",lat:68.78,lng:-120.93,char:"F/M",desc:"Franklin meets Michael for the first time repossessing his son Jimmy car in Rockford Hills.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Father/Son",lat:66.36,lng:-124.85,char:"M",desc:"Michael races across Del Perro to save Jimmy from being abandoned on a moving yacht.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Marriage Counseling",lat:68.78,lng:-120.93,char:"M/F",desc:"Michael and Franklin destroy the tennis coach house — belonging to cartel boss Martin Madrazo.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Daddy Little Girl",lat:66.36,lng:-124.85,char:"M",desc:"Michael tries to bond with Tracey at Del Perro beach but ends up chasing the yacht she is partying on.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Friend Request",lat:68.03,lng:-121.64,char:"M",desc:"Michael infiltrates LifeInvader HQ in Pillbox Hill and plants a device on Jay Norris prototype phone.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Casing the Jewel Store",lat:67.8,lng:-119.32,char:"M",desc:"Michael and Lester case Vangelico Fine Jewelry in preparation for the first heist.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Carbine Rifles Setup",lat:65.06,lng:-114.17,char:"F",desc:"Franklin steals carbine rifles from the Vagos for the Jewel Store Job.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"The Jewel Store Job",lat:67.8,lng:-119.32,char:"M/F",desc:"Rob Vangelico Fine Jewelry. Choose Smart approach (gas) or Loud (guns blazing).",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Mr. Philips",lat:74.93,lng:-110.08,char:"T",desc:"Trevor is introduced in Sandy Shores. He kills Johnny Klebitz and takes over Blaine County meth trade.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Nervous Ron",lat:73.86,lng:-110.6,char:"T",desc:"Trevor and Ron take down a Lost MC gun shipment at the Sandy Shores airfield.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Crystal Maze",lat:74.82,lng:-113.06,char:"T",desc:"Trevor and Chef defend the meth lab from the Lost MC and Aztecas simultaneously.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Trevor Philips Industries",lat:74.93,lng:-110.08,char:"T",desc:"Trevor meets the O Neil Brothers for the first time. The rivalry begins.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Chop",lat:65.06,lng:-114.17,char:"F",desc:"Franklin and Lamar use Chop the Rottweiler to track down D, a Ballas member.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Hood Safari",lat:63.71,lng:-113.01,char:"F/T/L",desc:"Franklin, Trevor and Lamar go on a drug pickup in Davis which goes wrong fast.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Fame or Shame",lat:63.95,lng:-115.33,char:"M/T",desc:"Michael and Trevor race to the Maze Bank Arena to confront Tracey auditioning for the show.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Dead Man Walking",lat:64.89,lng:-112.93,char:"M",desc:"Michael goes to the city morgue in Mission Row to retrieve a body for Dave Norton and the FIB.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Did Somebody Say Yoga?",lat:68.78,lng:-120.93,char:"M",desc:"Michael does yoga then gets drugged and wakes up in the desert.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Three Companies",lat:66.66,lng:-115.65,char:"M/T/F",desc:"Michael and FIB agents fast-rope from a helicopter while Trevor flies it. Extract Kerimov from IAA.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"By the Book",lat:74.93,lng:-110.08,char:"T",desc:"Trevor tortures Mr. K in Sandy Shores on FIB orders while Michael stakes out the target in LS.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"I Fought the Law",lat:67.69,lng:-114.58,char:"F/M",desc:"Franklin and Michael provide cover for Devin Weston sports car driver across Vinewood.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Eye in the Sky",lat:66.8,lng:-115.91,char:"T/F",desc:"Trevor pilots the police helicopter thermal camera while Franklin tracks the thief below.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Mr. Richards",lat:68.02,lng:-121.55,char:"T",desc:"Trevor is hired by Solomon Richards to deal with the Azerbaijani agency threatening his star.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Caida Libre",lat:68.78,lng:-120.93,char:"T/M",desc:"Trevor shoots down a Madrazo cartel plane; Michael searches the crash site.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Deep Inside",lat:68.02,lng:-121.55,char:"F",desc:"Franklin infiltrates Vinewood Studios to steal the JB 700W prototype car for Devin Weston.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Minor Turbulence",lat:73.86,lng:-110.6,char:"T",desc:"Trevor hijacks a cargo plane mid-air above the Sandy Shores airfield.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Paleto Score Setup",lat:81.71,lng:-125.23,char:"M/T",desc:"Michael and Trevor scout Paleto Bay, watching the bank and police response.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Predator",lat:79.49,lng:-120.91,char:"M/T/F",desc:"The trio use a military drone to hunt and kill the O Neil Brothers on Chiliad Mountain.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Military Hardware Setup",lat:76.18,lng:-133.54,char:"T",desc:"Trevor steals military hardware from the National Guard convoy for the Paleto Score.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"The Paleto Score",lat:81.71,lng:-125.23,char:"M/T/F",desc:"Rob the Paleto Bay bank while a full military response pursues you down the Pacific Highway.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Monkey Business",lat:68.5,lng:-128.75,char:"M/T/F",desc:"Infiltrate Humane Labs via submarine, steal nerve agent samples for the FIB.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Hang Ten",lat:65.36,lng:-120.55,char:"T",desc:"Trevor tracks down Floyd and Debra at their Vespucci apartment.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Surveying the Score",lat:66.8,lng:-115.92,char:"M/L",desc:"Michael and Lester survey the Union Depository in downtown Pillbox Hill.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Bury the Hatchet",lat:68.02,lng:-121.55,char:"M/T",desc:"Michael flies to North Yankton to visit Brad grave — Trevor follows and discovers the betrayal.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Pack Man",lat:69.6,lng:-123.94,char:"F",desc:"Franklin delivers the final car for Devin Weston while evading police and mercenaries.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Fresh Meat",lat:61.74,lng:-108.32,char:"F/M",desc:"Franklin and Michael rescue Trevor from the Wei Cheng Triads at the La Mesa meat factory.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"The Ballad of Rocco",lat:68.02,lng:-121.55,char:"M/T",desc:"Michael and Trevor chase Rocco through Vinewood to stop extortion of Solomon Richards.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Blitz Play",lat:65.7,lng:-117.47,char:"M/T/F",desc:"The trio ambush an FIB armoured truck on the Great Ocean Highway.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Lamar Down",lat:65.06,lng:-114.17,char:"F/T/M",desc:"Franklin, Trevor and Michael rescue Lamar from Ballas at the Sawmill in Blaine County.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Meltdown",lat:68.79,lng:-113.02,char:"M",desc:"Michael races to the Vinewood Bowl to rescue Amanda and Tracey from Devin Weston mercenaries.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Architects Plans Setup",lat:66.68,lng:-116.04,char:"F",desc:"Franklin steals the FIB HQ blueprints from an architect office.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"The Bureau Raid",lat:66.68,lng:-116.04,char:"M/F",desc:"Infiltrate FIB Headquarters. Choose Fire Crew or Rooftop approach.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Reuniting the Family",lat:68.78,lng:-120.93,char:"M",desc:"Michael reconciles with his family after Jimmy reveals he has been abducted.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Getaway Vehicle Setup",lat:66.8,lng:-115.92,char:"F",desc:"Franklin steals two getaway vehicles across Los Santos for the Big Score.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Driller Setup",lat:66.8,lng:-115.92,char:"T",desc:"Trevor steals a driller from a construction site for the Subtle approach of the Big Score.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Sidetracked Setup",lat:76.64,lng:-109.8,char:"T",desc:"Trevor steals a train from McKenzie Airfield for the Obvious approach of the Big Score.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Cleaning Out the Bureau",lat:66.68,lng:-116.04,char:"M",desc:"Michael and Lester destroy servers at the FIB building after the Bureau Raid.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"The Big Score",lat:66.45,lng:-115.65,char:"M/T/F",desc:"Rob the Union Depository of billions in gold. Subtle approach (disguised) or Obvious (armoured train).",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"Something Sensible – Ending A",lat:63.73,lng:-110.74,char:"F",desc:"Ending A: Franklin lures Trevor to the El Burro Heights oil fields and kills him.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"The Times Come – Ending B",lat:78.17,lng:-107.62,char:"F",desc:"Ending B: Franklin pursues Michael to the satellite dishes near Mount Gordo. The darkest ending.",imgs:[]},
-{type:"Main Mission",cat:"Story",title:"The Third Way – Ending C",lat:66.45,lng:-115.65,char:"M/T/F",desc:"Ending C (canon): All three work together to eliminate all antagonists. Everyone survives.",imgs:[]},
-{type:"Heist Setup",cat:"Story",title:"Scope Out – Merryweather",lat:60.8,lng:-105.94,char:"M",desc:"Michael scouts the Port of LS terminal to find the government superweapon container.",imgs:[]},
-{type:"Heist Setup",cat:"Story",title:"The Merryweather Heist",lat:60.8,lng:-105.94,char:"M/T/F",desc:"The crew attempts to steal a government superweapon. Dave Norton forces them to return it.",imgs:[]},
-{type:"Heist Setup",cat:"Story",title:"Draugur – Blitz Play Setup",lat:65.7,lng:-117.47,char:"M/T/F",desc:"The trio steal a BobCat Security armoured truck to use as the decoy for Blitz Play.",imgs:[]},
-{type:"Heist Setup",cat:"Story",title:"Gauntlet – Bureau Raid Setup",lat:66.8,lng:-115.92,char:"M",desc:"Steal a fire truck for the Bureau Raid fire crew approach.",imgs:[]},
-{type:"Heist Setup",cat:"Story",title:"Tow Truck – Big Score Setup",lat:67.8,lng:-119.32,char:"F",desc:"Franklin steals a flatbed tow truck for the Big Score heist.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Tonya – Pulling Favors",lat:65.06,lng:-114.17,char:"F",desc:"Tonya asks Franklin to tow cars while JB is on a bender. 5-mission chain around Strawberry.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Beverly – Paparazzo",lat:68.02,lng:-121.55,char:"M",desc:"Beverly Felton hires Michael to photograph celebrities. 6-mission chain around Vinewood.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Omega – Far Out",lat:74.93,lng:-110.08,char:"F",desc:"Sandy Shores conspiracy theorist Omega asks Franklin to collect all 50 Spaceship Parts.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Dom – Risk Assessment",lat:67.69,lng:-114.58,char:"F/M",desc:"Extreme sports enthusiast Dom challenges the protagonists to skydiving and base jumping.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Barry – Grass Roots",lat:65.06,lng:-114.17,char:"F/M/T",desc:"Barry gives each protagonist a joint with hallucinations: clowns for T, aliens for M, animals for F.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Mary-Ann – Exercising Demons",lat:68.02,lng:-121.55,char:"F/M/T",desc:"Competitive Mary-Ann challenges each protagonist to intense cycling and running races.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Peter Dreyfuss – A Starlet in Vinewood",lat:68.02,lng:-121.55,char:"F",desc:"Collect all 50 Letter Scraps to unlock. Franklin discovers Dreyfuss murdered actress Leonora Johnson.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Maude – Bail Bonds",lat:74.93,lng:-110.08,char:"T",desc:"Maude Eccles sends Trevor to bring in 4 bail jumpers dead or alive across Blaine County.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Epsilon Program – Seeking the Truth",lat:68.51,lng:-120.11,char:"M",desc:"Michael joins the Epsilon cult (Kifflom!). 10-mission chain ending with a choice to keep or donate $2.1M.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Cletus – Target Practice",lat:73.86,lng:-110.6,char:"T",desc:"Cletus teaches Trevor how to hunt deer in Blaine County.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Cletus – Fair Game",lat:73.86,lng:-110.6,char:"T",desc:"Cletus and Trevor go hunting elk together, but competing hunters interrupt.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Joe and Josef – Extra Commission",lat:77.12,lng:-108.96,char:"T",desc:"Trevor encounters two redneck vigilantes abducting Mexicans near the O Neil ranch.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Manuel – Minute Man Blues",lat:77.12,lng:-108.96,char:"T",desc:"Trevor confronts Joe and Josef one final time after discovering their victims were US citizens.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Hao – Street Race",lat:65.06,lng:-114.17,char:"F",desc:"Hao challenges Franklin to a street race through South Los Santos.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Ursula – Hitchhiker",lat:79.49,lng:-120.91,char:"T/M/F",desc:"A woman named Ursula is stranded on the mountain. She reveals disturbing things on the drive home.",imgs:[]},
-{type:"Strangers & Freaks",cat:"Side Missions",title:"Dreyfuss – Reunion",lat:68.02,lng:-121.55,char:"F",desc:"Final confrontation with Peter Dreyfuss. Franklin can kill him or let him go.",imgs:[]},
-{type:"Assassination",cat:"Side Missions",title:"Hotel Assassination",lat:69.61,lng:-120.75,char:"F",desc:"Lester asks Franklin to assassinate Bret Lowrey outside the Von Crastenburg Hotel. Affects BAWSAQ: buy Bilkinton before.",imgs:[]},
-{type:"Assassination",cat:"Side Missions",title:"The Multi Target Assassination",lat:66.8,lng:-115.92,char:"F",desc:"Lester marks 4 Betta Pharmaceutical jury members across LS. Buy Debonaire cigarettes before.",imgs:[]},
-{type:"Assassination",cat:"Side Missions",title:"The Vice Assassination",lat:66.8,lng:-115.92,char:"F",desc:"Kill the vice chairman of Facade Corp. Invest in Facade stock before the hit.",imgs:[]},
-{type:"Assassination",cat:"Side Missions",title:"The Bus Assassination",lat:66.8,lng:-115.92,char:"F",desc:"Kill Jackson Skinner by forcing his car off the road near the bus terminal.",imgs:[]},
-{type:"Assassination",cat:"Side Missions",title:"The Construction Assassination",lat:66.01,lng:-116.1,char:"F",desc:"Kill CEO at Maze Bank construction tower. Buy Gold Coast shares beforehand.",imgs:[]},
-{type:"Safehouse",cat:"Properties",title:"Michael Mansion – Rockford Hills",lat:68.78,lng:-120.93,desc:"Michael luxurious family home in Rockford Hills. Features pool, tennis court and cinema.",imgs:[]},
-{type:"Safehouse",cat:"Properties",title:"Franklin Aunt House – Strawberry",lat:64.24,lng:-113.77,desc:"Franklin starting safehouse in Strawberry. A modest single-story home on Forum Drive.",imgs:[]},
-{type:"Safehouse",cat:"Properties",title:"Franklin House – Vinewood Hills",lat:69.61,lng:-123.93,desc:"A stunning modernist mansion in the hills, unlocked after Marriage Counseling.",imgs:[]},
-{type:"Safehouse",cat:"Properties",title:"Trevor Trailer – Sandy Shores",lat:74.93,lng:-110.08,desc:"Trevor base of operations — a beaten-up trailer in Sandy Shores. Centre of the meth operation.",imgs:[]},
-{type:"Safehouse",cat:"Properties",title:"Del Perro Heights Apartment",lat:66.08,lng:-122.05,desc:"Purchasable beachfront apartment in Del Perro for $200,000. Great views of Del Perro Pier.",imgs:[]},
-{type:"Safehouse",cat:"Properties",title:"Alta Street Apartment",lat:66.05,lng:-116.19,desc:"Purchasable mid-tier apartment in Alta for $223,000. Good central location.",imgs:[]},
-{type:"Property",cat:"Properties",title:"Sonar Collections Dock",lat:68.4,lng:-127.76,desc:"Purchase for $250,000. Unlocks the submarine and allows collection of 30 Nuclear Waste pieces.",imgs:[]},
-{type:"Property",cat:"Properties",title:"McKenzie Airfield",lat:76.64,lng:-109.8,desc:"Purchase for $150,000. Activates Trevor arms-dealing missions — supply airdrops across Blaine County.",imgs:[]},
-{type:"Property",cat:"Properties",title:"LS Customs – La Mesa",lat:65.25,lng:-110.65,desc:"Purchase for $349,000. All future car modifications at this LS Customs location are free permanently.",imgs:[]},
-{type:"Property",cat:"Properties",title:"Vanilla Unicorn Strip Club",lat:65.16,lng:-113.71,desc:"Trevor takes it over during the story. Generates $5,000 every 24 hours. Has a secret weapon cache.",imgs:[]},
-{type:"Property",cat:"Properties",title:"Smoke on the Water",lat:66.34,lng:-124.73,desc:"Purchase for $204,000. A medical marijuana dispensary on the Great Ocean Highway near Vespucci Beach.",imgs:[]},
-{type:"Property",cat:"Properties",title:"The Hen House",lat:78.43,lng:-116.89,desc:"Purchase for $80,000. Generates $1,600 per week. A small business in northern Blaine County.",imgs:[]},
-{type:"Hospital",cat:"Services",title:"Pillbox Hill Medical Center",lat:66.49,lng:-113.34,desc:"Downtown hospital in Pillbox Hill. Central location and convenient respawn.",imgs:[]},
-{type:"Hospital",cat:"Services",title:"Mount Zonah Medical Center",lat:67.65,lng:-119.45,desc:"Modern hospital near Rockford Hills. Respawn point for west LS.",imgs:[]},
-{type:"Hospital",cat:"Services",title:"Central LS Medical Center",lat:64.64,lng:-112.4,desc:"Main hospital in South LS. Primary player respawn point after death in that area.",imgs:[]},
-{type:"Hospital",cat:"Services",title:"Sandy Shores Medical Center",lat:74.7,lng:-110.63,desc:"Small clinic in Sandy Shores. The only medical facility in all of Blaine County.",imgs:[]},
-{type:"Police Station",cat:"Services",title:"Mission Row Police Station",lat:65.62,lng:-112.37,desc:"The main LSPD station in Downtown LS. Based on the LAPD Parker Center.",imgs:[]},
-{type:"Police Station",cat:"Services",title:"Vinewood Police Station",lat:69.58,lng:-122.95,desc:"Smaller LSPD station serving the Vinewood Hills area.",imgs:[]},
-{type:"Police Station",cat:"Services",title:"Sandy Shores Sheriff Dept",lat:74.72,lng:-110.57,desc:"Blaine County Sheriff Office substation. Small desert facility.",imgs:[]},
-{type:"Police Station",cat:"Services",title:"Paleto Bay Sheriff Dept",lat:80.94,lng:-126.54,desc:"Northernmost police station in the game. Featured in the Paleto Score setup.",imgs:[]},
-{type:"Airport",cat:"Services",title:"Los Santos International Airport",lat:62.23,lng:-119.59,desc:"Main airport of Los Santos, based on LAX. Multiple runways. Used in several heist missions.",imgs:[]},
-{type:"Airport",cat:"Services",title:"Sandy Shores Airfield",lat:73.86,lng:-110.6,desc:"A desert airstrip near Sandy Shores. Trevor uses it heavily in multiple missions.",imgs:[]},
-{type:"Airport",cat:"Services",title:"McKenzie Airfield",lat:76.64,lng:-109.8,desc:"Purchasable airfield near Grapeseed. Site of Trevor arms-smuggling missions.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Maze Bank Tower",lat:66.25,lng:-115.45,desc:"The tallest building in Los Santos — inspired by the US Bank Tower. Iconic skyline anchor.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Vinewood Sign",lat:70.08,lng:-113.7,desc:"GTA take on the Hollywood Sign. Visible from most of the city.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Mount Chiliad",lat:79.49,lng:-120.91,desc:"The highest peak in San Andreas. Home to cable car, ski lodge, and the famous Chiliad Mystery.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Galileo Observatory",lat:70.47,lng:-119.98,desc:"Inspired by the Griffith Observatory in LA. Panoramic views of the city.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Del Perro Pier",lat:66.36,lng:-124.85,desc:"Santa Monica Pier-style amusement boardwalk. Features Ferris wheel, roller coaster and food stalls.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Maze Bank Arena",lat:63.95,lng:-115.33,desc:"Los Santos main sports stadium — based on the Staples Center.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Port of Los Santos",lat:61.15,lng:-105.67,desc:"Massive industrial port on the south-east coast. Used in heist setups and the Merryweather mission.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Alamo Sea",lat:75.09,lng:-116.26,desc:"Large inland body of water in Blaine County — inspired by the Salton Sea.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Fort Zancudo",lat:76.18,lng:-133.54,desc:"Military base on the west coast. 5-star wanted level if entered. Contains jets, tanks and Buzzards.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Raton Canyon",lat:76.03,lng:-121.13,desc:"A dramatic canyon through the northern wilderness. Red river, forests and cliffs.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Grand Senora Desert",lat:72.53,lng:-110.37,desc:"The Mojave-inspired arid region east of Sandy Shores. Dotted with wind farms, mesas and oil pumps.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Paleto Bay",lat:81.71,lng:-125.23,desc:"A small coastal town in the far north. Site of the Paleto Score bank heist.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Sandy Shores Town",lat:74.93,lng:-110.08,desc:"A desert community east of the Alamo Sea. Home to Trevor operations.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Humane Labs and Research",lat:71.74,lng:-99.43,desc:"Government biomedical facility. Targeted during Monkey Business and several heist setups.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Vinewood Racetrack",lat:67.69,lng:-114.58,desc:"Horse racing facility. Bet on races or ride the horse yourself.",imgs:[]},
-{type:"Landmark",cat:"World",title:"LifeInvader HQ",lat:68.03,lng:-121.64,desc:"Facebook parody in Pillbox Hill. Site of the Friend Request mission.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Rockford Hills",lat:68.78,lng:-120.93,desc:"The Beverly Hills of Los Santos. Wealthy mansions including Michael home.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Vespucci Beach",lat:65.89,lng:-121.97,desc:"Los Santos Venice Beach. Muscle Beach, skate park, lifeguard towers.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Davis – Grove Street",lat:63.71,lng:-113.01,desc:"Franklin home neighbourhood. Grove Street is a direct GTA San Andreas reference.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Union Depository",lat:66.45,lng:-115.65,desc:"The most secure financial institution in Los Santos. Target of the final heist.",imgs:[]},
-{type:"Landmark",cat:"World",title:"Vinewood Bowl",lat:68.79,lng:-113.02,desc:"Open-air music venue inspired by the Hollywood Bowl. Site of the Meltdown mission.",imgs:[]},
-{type:"Landmark",cat:"World",title:"FIB Headquarters",lat:66.68,lng:-116.04,desc:"Federal Investigation Bureau HQ in Pillbox Hill. Target of the Bureau Raid.",imgs:[]},
-{type:"Landmark",cat:"World",title:"IAA Headquarters",lat:66.66,lng:-115.65,desc:"Intelligence Agency building in downtown LS. Smaller than FIB but equally secretive.",imgs:[]},
-{type:"Activity",cat:"World",title:"Los Santos Golf Club",lat:68.81,lng:-123.67,desc:"Fully playable 18-hole golf game in the hills west of LS. Any character can play.",imgs:[]},
-{type:"Activity",cat:"World",title:"Ammu-Nation Shooting Range",lat:65.57,lng:-114.52,desc:"Complete shooting challenges across Bronze, Silver and Gold tiers to unlock weapon discounts.",imgs:[]},
-{type:"Activity",cat:"World",title:"Yoga – Michael Backyard",lat:68.78,lng:-120.93,desc:"Morning yoga sessions with Amanda. Match on-screen poses with the analog sticks.",imgs:[]},
-{type:"Activity",cat:"World",title:"Yellow Jack Inn – Darts and Arm Wrestling",lat:73.03,lng:-113.24,desc:"The Yellow Jack Inn in Sandy Shores offers darts and arm wrestling mini-games.",imgs:[]},
-{type:"Activity",cat:"World",title:"Triathlon – Vespucci Beach",lat:65.89,lng:-121.97,desc:"Swim, bike and run triathlon starting at Vespucci Beach.",imgs:[]},
-{type:"Activity",cat:"World",title:"Triathlon – Alamo Sea",lat:75.09,lng:-116.26,desc:"Triathlon around the Alamo Sea in Blaine County.",imgs:[]},
-{type:"Activity",cat:"World",title:"Parachuting – Mount Chiliad",lat:79.49,lng:-120.91,desc:"13 parachute jump challenges. Required for the Dom strangers and freaks chain.",imgs:[]},
-{type:"Activity",cat:"World",title:"Street Racing – Cypress Flats",lat:65.16,lng:-111.62,desc:"Illegal street races around the industrial Cypress Flats area of south LS.",imgs:[]},
-{type:"Activity",cat:"World",title:"Flight School – LSIA",lat:62.23,lng:-119.59,desc:"Complete 10 flight school lessons at LSIA. Required for 100% completion.",imgs:[]},
-{type:"Activity",cat:"World",title:"Hunting – Chiliad Mountain",lat:79.49,lng:-120.91,desc:"Hunt elk, coyote and mountain lions. Companion missions with Cletus.",imgs:[]},
-{type:"Gang Territory",cat:"World",title:"Families Territory – Davis",lat:63.71,lng:-113.01,desc:"Franklin old neighbourhood. The Chamberlain Gangster Families control Davis and surroundings.",imgs:[]},
-{type:"Gang Territory",cat:"World",title:"Ballas Territory – Strawberry",lat:65.06,lng:-114.17,desc:"The Ballas control Strawberry and Forum Drive. Bitter rivals of the Families.",imgs:[]},
-{type:"Gang Territory",cat:"World",title:"Vagos – South LS",lat:63.37,lng:-110.77,desc:"The Los Santos Vagos patrol south-east LS near the port and Elysian Island.",imgs:[]},
-{type:"Gang Territory",cat:"World",title:"Lost MC – Sandy Shores",lat:74.93,lng:-110.08,desc:"The Lost Motorcycle Club desert chapter. Trevor systematically destroys them in Mr Philips.",imgs:[]},
-{type:"Gang Territory",cat:"World",title:"Merryweather Security",lat:60.8,lng:-105.94,desc:"The private military company Los Santos port operations.",imgs:[]},
-{type:"Gang Territory",cat:"World",title:"O Neil Ranch – Grapeseed",lat:77.12,lng:-108.96,desc:"The O Neil Brothers family meth ranch in Grapeseed. Trevor destroys it during the Predator arc.",imgs:[]},
-{type:"Easter Egg",cat:"World",title:"Mount Chiliad UFO Mystery",lat:79.49,lng:-120.91,desc:"The most famous mystery in GTA V. A mural at the peak hints at a UFO visible at 3AM in rain at 100%.",imgs:[]},
-{type:"Easter Egg",cat:"World",title:"Ghost of Jolene Cranley-Evans",lat:78.87,lng:-107.76,desc:"Between 23:00 and midnight, Jolene ghost appears on the cliff of Mount Gordo.",imgs:[]},
-{type:"Easter Egg",cat:"World",title:"Frozen Alien – Raton Canyon",lat:76.21,lng:-121.23,desc:"A small alien figure frozen in the ice beneath the river near Raton Canyon.",imgs:[]},
-{type:"Easter Egg",cat:"World",title:"Bigfoot – The Last One",lat:79.49,lng:-120.91,desc:"At 100% completion, Franklin encounters a mountain lion that reveals it is actually Bigfoot.",imgs:[]},
-{type:"Easter Egg",cat:"World",title:"Infinity Killer Writings",lat:77.63,lng:-105.89,desc:"Infinity 8 is carved into a rock face near Raton Canyon. The Infinity Killer murdered 8 hikers.",imgs:[]},
-{type:"Easter Egg",cat:"World",title:"DeLorean Time Machine Reference",lat:72.53,lng:-110.37,desc:"A wrecked sports car with burned tire tracks in the Grand Senora Desert — a Back to the Future homage.",imgs:[]},
-{type:"Easter Egg",cat:"World",title:"Sandy Shores UFO at 3AM",lat:74.72,lng:-110.3,desc:"A silent UFO hovers above Sandy Shores at exactly 3AM. No special requirements needed.",imgs:[]},
-{type:"Easter Egg",cat:"World",title:"Fort Zancudo UFO at 3AM",lat:73.66,lng:-108.87,desc:"A UFO hovers inside Fort Zancudo at 3AM. Getting close triggers immediate 5-star military response.",imgs:[]},
-{type:"Easter Egg",cat:"World",title:"Sunken UFO – Pacific Ocean",lat:83.17,lng:-121.55,desc:"A sunken UFO rests on the seabed deep in the Pacific Ocean off the western coast. Requires submarine.",imgs:[]},
-{type:"Easter Egg",cat:"World",title:"Hatch – Easter Egg Island",lat:71.87,lng:-96.07,desc:"A metal hatch on a small island east of San Andreas — a direct reference to the TV show Lost.",imgs:[]},
-{type:"Easter Egg",cat:"World",title:"Murder Mystery – Letter Scraps",lat:68.02,lng:-121.55,desc:"50 letter scraps scattered across the map. Assembled they reveal the murder of actress Leonora Johnson.",imgs:[]},
-{type:"Easter Egg",cat:"World",title:"Serial Killer Jars – Mount Chiliad",lat:79.49,lng:-120.91,desc:"Three jars containing human body parts are scattered on Mount Chiliad.",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #1",lat:76.18,lng:-133.52,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #2",lat:75.69,lng:-131.96,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #3",lat:76.37,lng:-130.8,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #4",lat:77.69,lng:-130.04,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #5",lat:77.99,lng:-127.07,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #6",lat:78.46,lng:-125.79,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #7",lat:78.87,lng:-123.94,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #8",lat:79.28,lng:-122.09,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #9",lat:79.54,lng:-120.67,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #10",lat:79.74,lng:-118.7,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #11",lat:79.94,lng:-116.72,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #12",lat:80.2,lng:-115.3,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #13",lat:80.45,lng:-113.88,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #14",lat:79.65,lng:-111.81,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #15",lat:78.85,lng:-109.73,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #16",lat:78.04,lng:-107.65,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #17",lat:77.24,lng:-105.58,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #18",lat:76.44,lng:-103.5,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #19",lat:70.47,lng:-133.45,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #20",lat:71.0,lng:-134.83,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #21",lat:71.54,lng:-136.21,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #22",lat:72.5,lng:-137.86,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #23",lat:73.46,lng:-139.51,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #24",lat:75.26,lng:-141.68,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #25",lat:76.42,lng:-141.35,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #26",lat:77.16,lng:-140.76,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #27",lat:78.12,lng:-142.41,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #28",lat:79.02,lng:-143.49,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #29",lat:79.76,lng:-142.9,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Nuclear Waste",cat:"Collectibles",title:"Nuclear Waste #30",lat:80.07,lng:-142.04,desc:"Collect 30 Nuclear Waste barrels from the ocean floor using the submarine (Sonar Dock required).",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #1 – Zancudo Farm Barn",lat:79.57,lng:-120.95,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #2 – Grapeseed Farm Shed",lat:77.85,lng:-111.74,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #3 – Grapeseed Cattle Field",lat:77.54,lng:-112.6,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #4 – San Chianski Mountain",lat:76.36,lng:-108.71,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #5 – Alien Graffiti Hill",lat:77.23,lng:-113.46,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #6 – Sandy Shores Bay",lat:75.15,lng:-110.59,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #7 – Grand Senora Rock Formation",lat:74.78,lng:-110.89,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #8 – Satellite Dish Array",lat:73.19,lng:-108.85,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #9 – Desert Boat",lat:74.7,lng:-113.99,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #10 – Derelict Desert House",lat:76.28,lng:-123.91,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #11 – Rocky Desert Valley",lat:74.28,lng:-115.83,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #12 – Welcome House",lat:74.54,lng:-114.42,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #13 – Underwater Cave",lat:75.53,lng:-102.41,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #14 – Tataviam Mountain Beach",lat:74.33,lng:-104.29,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #15 – Drainage Pipe",lat:72.99,lng:-110.82,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #16 – Underwater Jetty",lat:71.63,lng:-113.13,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #17 – Freeway Walkway",lat:66.08,lng:-113.37,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #18 – Construction Container",lat:65.01,lng:-110.6,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #19 – Small Pacific Island",lat:60.41,lng:-110.38,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #20 – Vagos Sewer Pipe",lat:62.7,lng:-113.38,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #21 – Elysian Island Ruins",lat:61.83,lng:-118.62,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #22 – Gasometer Pipe",lat:62.9,lng:-121.39,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #23 – Alien Sculptures",lat:64.06,lng:-121.06,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #24 – LSIA South Fence",lat:61.99,lng:-120.3,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #25 – Hospital Roof",lat:64.87,lng:-115.25,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #26 – Freeway Homeless Camp",lat:65.87,lng:-123.23,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #27 – Bean Machine Coffee",lat:66.58,lng:-118.42,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #28 – Penris Building Roof",lat:67.38,lng:-120.49,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #29 – Construction Tunnel",lat:67.06,lng:-119.24,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #30 – Billboard Ladder",lat:66.56,lng:-124.19,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #31 – Vinewood Studios",lat:69.2,lng:-124.78,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #32 – Burton Roundabout",lat:69.25,lng:-123.23,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #33 – Hotel Rooftop Pool",lat:69.76,lng:-124.33,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #34 – Golf Course Island",lat:69.1,lng:-125.77,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #35 – Vinewood Hills Lake",lat:71.68,lng:-123.69,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #36 – Concrete Jetty Building",lat:71.41,lng:-122.99,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #37 – Galileo Observatory Roof",lat:70.47,lng:-119.98,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #38 – Richman Glen Tree",lat:70.16,lng:-126.42,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #39 – Tongva Hills Cave",lat:71.66,lng:-129.46,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #40 – Banham Canyon Telescope",lat:71.19,lng:-130.74,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #41 – Tongva Hills Hedge Farm",lat:72.93,lng:-130.25,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #42 – Tongva Bridge Waterfall",lat:72.13,lng:-128.17,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #43 – Zancudo River Bridge",lat:74.55,lng:-126.52,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #44 – Zancudo River Alcove",lat:74.59,lng:-124.97,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #45 – Mount Josiah Rock Ledge",lat:75.51,lng:-128.16,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #46 – Bridge Underside",lat:76.69,lng:-132.05,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #47 – Cassoy Creek Waterfall",lat:75.98,lng:-126.88,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #48 – Paleto Cove Hill",lat:77.85,lng:-131.72,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #49 – Paleto Forest Tunnel",lat:77.15,lng:-128.66,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Spaceship Part",cat:"Collectibles",title:"Spaceship Part #50 – Grey Tower",lat:77.25,lng:-127.67,desc:"One of 50 Spaceship Parts for the Omega stranger mission. Collect all 50 to build the Space Docker.",imgs:[]},
-{type:"Hidden Package",cat:"Collectibles",title:"Hidden Package #1",lat:70.13,lng:-130.77,desc:"Sonar Dock area — $25,000 briefcase, respawns every 48 hrs",imgs:[]},
-{type:"Hidden Package",cat:"Collectibles",title:"Hidden Package #2",lat:79.35,lng:-134.75,desc:"North Pacific Ocean floor",imgs:[]},
-{type:"Hidden Package",cat:"Collectibles",title:"Hidden Package #3",lat:76.3,lng:-108.15,desc:"Far north-east seabed",imgs:[]},
-{type:"Hidden Package",cat:"Collectibles",title:"Hidden Package #4",lat:72.78,lng:-100.7,desc:"East coast underwater",imgs:[]},
-{type:"Hidden Package",cat:"Collectibles",title:"Hidden Package #5",lat:69.55,lng:-100.28,desc:"East ocean central",imgs:[]},
-{type:"Hidden Package",cat:"Collectibles",title:"Hidden Package #6",lat:67.97,lng:-100.35,desc:"South-east ocean floor",imgs:[]},
-{type:"Hidden Package",cat:"Collectibles",title:"Hidden Package #7",lat:62.27,lng:-103.12,desc:"Southern ocean near the port",imgs:[]},
-{type:"Hidden Package",cat:"Collectibles",title:"Hidden Package #8",lat:63.09,lng:-117.3,desc:"South bay underwater",imgs:[]},
-{type:"Hidden Package",cat:"Collectibles",title:"Hidden Package #9",lat:62.68,lng:-119.15,desc:"South-west coast seabed",imgs:[]},
-{type:"Hidden Package",cat:"Collectibles",title:"Hidden Package #10",lat:77.36,lng:-138.78,desc:"Far north-west ocean",imgs:[]},
-{type:"Hidden Package",cat:"Collectibles",title:"Hidden Package #11",lat:77.9,lng:-140.16,desc:"Far north-west deep water",imgs:[]},
-{type:"Hidden Package",cat:"Collectibles",title:"Hidden Package #12",lat:78.74,lng:-128.59,desc:"North coast near Paleto Bay",imgs:[]},
-{type:"Vehicle Spawn",cat:"Collectibles",title:"Adder (Bugatti Veyron)",lat:69.61,lng:-123.93,desc:"Spawns in a parking lot near Rockford Hills. The fastest car in the base game.",imgs:[]},
-{type:"Vehicle Spawn",cat:"Collectibles",title:"Rare Sports Car Spawn",lat:71.02,lng:-129.06,desc:"Multiple sports cars spawn regularly on the Tongva Hills road.",imgs:[]},
-{type:"Vehicle Spawn",cat:"Collectibles",title:"Unmarked FIB Buffalo",lat:73.24,lng:-109.41,desc:"Spawns near a government facility in the Grand Senora Desert.",imgs:[]},
-{type:"Vehicle Spawn",cat:"Collectibles",title:"Buzzard Attack Helicopter",lat:76.18,lng:-133.54,desc:"Rooftop inside Fort Zancudo. Climb ladders on the side of the building.",imgs:[]},
-{type:"Vehicle Spawn",cat:"Collectibles",title:"Rhino Tank",lat:76.18,lng:-133.54,desc:"Found inside Fort Zancudo. Immediately triggers a 5-star wanted level.",imgs:[]},
-{type:"Vehicle Spawn",cat:"Collectibles",title:"Sanchez Dirt Bike",lat:74.93,lng:-110.08,desc:"Commonly found around the Sandy Shores and desert areas.",imgs:[]},
-{type:"Epsilon Car",cat:"Collectibles",title:"Declasse Tornado (Epsilon)",lat:68.59,lng:-120.0,desc:"Epsilon Program mission vehicle. Collect during the Seeking the Truth questline with Michael.",imgs:[]},
-{type:"Epsilon Car",cat:"Collectibles",title:"Pegassi Vacca (Epsilon)",lat:68.02,lng:-121.55,desc:"Epsilon Program mission vehicle. Collect during the Seeking the Truth questline with Michael.",imgs:[]},
-{type:"Epsilon Car",cat:"Collectibles",title:"Benefactor Surano (Epsilon)",lat:68.78,lng:-120.93,desc:"Epsilon Program mission vehicle. Collect during the Seeking the Truth questline with Michael.",imgs:[]},
-{type:"Epsilon Car",cat:"Collectibles",title:"Enus Super Diamond (Epsilon)",lat:69.61,lng:-123.93,desc:"Epsilon Program mission vehicle. Collect during the Seeking the Truth questline with Michael.",imgs:[]},
-{type:"Epsilon Car",cat:"Collectibles",title:"Dinka Double-T (Epsilon)",lat:69.63,lng:-125.04,desc:"Epsilon Program mission vehicle. Collect during the Seeking the Truth questline with Michael.",imgs:[]},
-{type:"Epsilon Tract",cat:"Collectibles",title:"Epsilon Tract 1 – Mount Chiliad Summit",lat:79.49,lng:-120.91,desc:"Near the summit of Mount Chiliad.",imgs:[]},
-{type:"Epsilon Tract",cat:"Collectibles",title:"Epsilon Tract 2 – Shipwreck Island",lat:67.69,lng:-97.54,desc:"On a small island south-east of the main map.",imgs:[]},
-{type:"Epsilon Tract",cat:"Collectibles",title:"Epsilon Tract 3 – Northern Cliff",lat:82.86,lng:-130.1,desc:"Far north coast cliffside.",imgs:[]},
-{type:"Epsilon Tract",cat:"Collectibles",title:"Epsilon Tract 4 – Chiliad Interior",lat:79.14,lng:-120.69,desc:"Inside Mount Chiliad hiking trail.",imgs:[]},
-{type:"Epsilon Tract",cat:"Collectibles",title:"Epsilon Tract 5 – Old Ruins",lat:69.57,lng:-124.48,desc:"Near abandoned ruins in West LS.",imgs:[]},
-{type:"Epsilon Tract",cat:"Collectibles",title:"Epsilon Tract 6 – Northern Forest",lat:78.49,lng:-132.12,desc:"Deep in the northern Chiliad forest.",imgs:[]},
-{type:"Epsilon Tract",cat:"Collectibles",title:"Epsilon Tract 7 – Tongva Hills House",lat:71.66,lng:-129.46,desc:"Near a remote house in Tongva Hills.",imgs:[]},
-{type:"Epsilon Tract",cat:"Collectibles",title:"Epsilon Tract 8 – Chiliad Tree",lat:79.46,lng:-120.83,desc:"Near a distinctive lone tree on Chiliad.",imgs:[]},
-{type:"Epsilon Tract",cat:"Collectibles",title:"Epsilon Tract 9 – Maze Bank Area",lat:66.25,lng:-115.45,desc:"Near the Maze Bank Tower in downtown LS.",imgs:[]},
-{type:"Epsilon Tract",cat:"Collectibles",title:"Epsilon Tract 10 – Del Perro Beachside",lat:66.36,lng:-124.85,desc:"Near the Del Perro beachfront.",imgs:[]}
-];
 
-// ─── COLORS & EMOJI ──────────────────────────────────────────────────────────
-// Character color scheme: Franklin=green, Michael=blue, Trevor=orange, mixed=purple
-const CHAR_COLORS = {
-  "F":"#10b981",   // Franklin — green
-  "M":"#3b82f6",   // Michael — blue
-  "T":"#f97316",   // Trevor — orange
-  "F/L":"#10b981","F/M":"#a855f7","F/T":"#a855f7","M/T":"#a855f7",
-  "M/F":"#a855f7","T/M":"#a855f7","T/F":"#a855f7","F/T/L":"#10b981",
-  "M/T/F":"#ec4899","M/T/B":"#6366f1","M/L":"#3b82f6","F/M/T":"#ec4899",
-  "T/M/F":"#ec4899","T/F/L":"#10b981","F/T/M":"#ec4899","F/L/T":"#10b981"
-};
-function getMissionColor(loc) {
-  if(loc.char && CHAR_COLORS[loc.char]) return CHAR_COLORS[loc.char];
-  return getMissionColor(loc);
-}
-const COLORS = {
-  "Main Mission":"#60a5fa","Heist Setup":"#818cf8","Strangers & Freaks":"#a78bfa",
-  "Assassination":"#f43f5e","Safehouse":"#34d399","Easter Egg":"#fbbf24",
-  "Property":"#fb923c","Hospital":"#f87171","Police Station":"#93c5fd",
-  "Airport":"#67e8f9","Landmark":"#e2e8f0","Activity":"#86efac",
-  "Spaceship Part":"#7dd3fc","Nuclear Waste":"#4ade80","Hidden Package":"#bbf7d0",
-  "Vehicle Spawn":"#a5b4fc","Gang Territory":"#f43f5e","Epsilon Car":"#d8b4fe",
-  "Epsilon Tract":"#c084fc"
-};
-const EMOJI = {
-  "Main Mission":"🎯","Heist Setup":"💰","Strangers & Freaks":"❓",
-  "Assassination":"🔫","Safehouse":"🏠","Easter Egg":"🥚",
-  "Property":"🏢","Hospital":"🏥","Police Station":"🚔",
-  "Airport":"✈️","Landmark":"📍","Activity":"🎮",
-  "Spaceship Part":"🛸","Nuclear Waste":"☢️","Hidden Package":"💵",
-  "Vehicle Spawn":"🚗","Gang Territory":"💀","Epsilon Car":"🚙",
-  "Epsilon Tract":"📜"
-};
-const CAT_GROUPS = {
-  "Story":["Main Mission","Heist Setup"],
-  "Side Missions":["Strangers & Freaks","Assassination"],
-  "Collectibles":["Spaceship Part","Nuclear Waste","Hidden Package","Vehicle Spawn","Epsilon Car","Epsilon Tract"],
-  "Properties & Services":["Safehouse","Property","Hospital","Police Station","Airport"],
-  "World & Secrets":["Landmark","Easter Egg","Gang Territory","Activity"]
-};
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-// ─── MAP SETUP ────────────────────────────────────────────────────────────────
-// The GTA V tile set from gta5-map.github.io uses standard Leaflet lat/lng.
-// The San Andreas map occupies approximately:
-//   Latitude (North-South):  ~54° to ~87°
-//   Longitude (East-West):   ~-162° to ~-83°
-// We set maxBounds to prevent panning outside the ocean area that surrounds SA.
-
-const BOUNDS_SW = [50, -168];  // south-west corner (ocean edge)
-const BOUNDS_NE = [90, -75];   // north-east corner (ocean edge)
-const MAP_BOUNDS = L.latLngBounds(BOUNDS_SW, BOUNDS_NE);
-
-const map = L.map('map', {
-  minZoom: 3,
-  maxZoom: 7,
-  zoomControl: true,
-  maxBounds: MAP_BOUNDS,
-  maxBoundsViscosity: 1.0   // hard stop — cannot drag outside bounds at all
-});
-map.zoomControl.setPosition('bottomright');
-
-const tSat = L.tileLayer('https://gta5-map.github.io/tiles/satellite/{z}-{x}_{y}.png',{
-  tileSize:256, maxZoom:7, minZoom:3, noWrap:true,
-  attribution:'© GTA V fan map tiles'
-});
-const tRoad = L.tileLayer('https://gta5-map.github.io/tiles/road/{z}-{x}_{y}.png',{
-  tileSize:256, maxZoom:7, minZoom:3, noWrap:true,
-  attribution:'© GTA V fan map tiles'
-});
-tSat.addTo(map);
-let activeTile = 'sat';
-map.setView([70, -119], 4);
-
-// Fix black/empty map area — invalidate size on any layout change
-window.addEventListener('resize', () => map.invalidateSize());
-map.on('zoomend', () => map.invalidateSize());
-map.on('zoomstart', () => setTimeout(() => map.invalidateSize(), 50));
-// Also fix on initial load in case the container rendered late
-setTimeout(() => map.invalidateSize(), 100);
-
-document.querySelectorAll('[data-t]').forEach(b => {
-  b.onclick = () => {
-    if(b.dataset.t === activeTile) return;
-    activeTile === 'sat' ? map.removeLayer(tSat) : map.removeLayer(tRoad);
-    activeTile = b.dataset.t;
-    activeTile === 'sat' ? tSat.addTo(map) : tRoad.addTo(map);
-    document.querySelectorAll('[data-t]').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
-  };
-});
-
-// ─── COMPLETION TRACKING ──────────────────────────────────────────────────────
-const STORAGE_KEY = 'gtav_map_done_v2';
-function loadDone() {
-  try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); }
-  catch(e) { return new Set(); }
-}
-function saveDone(set) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify([...set])); } catch(e){}
-}
-const doneSet = loadDone();
-function updateProgress() {
-  const total = LOCS.length;
-  const done = doneSet.size;
-  document.getElementById('prog-text').textContent = `${done} / ${total}`;
-  document.getElementById('prog-fill').style.width = total ? `${(done/total)*100}%` : '0%';
-}
-updateProgress();
-
-// ─── MARKERS ─────────────────────────────────────────────────────────────────
-function mkIcon(locOrType, done) {
-  // Accept either a full loc object or just a type string (for tree icons)
-  const c = (typeof locOrType === 'object') ? getMissionColor(locOrType) : (COLORS[locOrType] || '#aaa');
-  const opacity = done ? '0.4' : '1';
-  const extra = done ? 'filter:grayscale(80%);' : '';
-  const sz = 12; // slightly larger for visibility
-  return L.divIcon({
-    html: `<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:${c};border:2px solid rgba(0,0,0,0.6);box-shadow:0 0 6px ${c}99;cursor:pointer;opacity:${opacity};${extra}"></div>`,
-    className: '', iconSize:[sz,sz], iconAnchor:[sz/2,sz/2], popupAnchor:[0,-8]
-  });
-}
-
-const groups = {};
-const typeList = [...new Set(LOCS.map(l => l.type))].sort();
-typeList.forEach(t => { groups[t] = L.layerGroup().addTo(map); });
-
-const markerMap = new Map();
-LOCS.forEach((loc, idx) => {
-  const c = getMissionColor(loc);
-  const isDone = doneSet.has(idx);
-  const m = L.marker([loc.lat, loc.lng], { icon: mkIcon(loc, isDone) });
-  m.bindPopup(`<div class="lpu">
-    <div class="lpu-tag" style="color:${c}">${EMOJI[loc.type]||'📍'} ${loc.type}</div>
-    <div class="lpu-title">${loc.title}</div>
-    ${loc.char ? `<div class="lpu-char">Character: ${loc.char}</div>` : ''}
-    <div class="lpu-hint">Click sidebar entry for details</div>
-  </div>`, {maxWidth:240});
-  m.on('click', () => showDetail(idx));
-  m.addTo(groups[loc.type]);
-  markerMap.set(idx, m);
-});
-
-// ─── SIDEBAR TREE ─────────────────────────────────────────────────────────────
-const treeWrap = document.getElementById('tree-wrap');
-const activeTypes = new Set(typeList);
-
-function refreshMarkerIcon(idx) {
-  const m = markerMap.get(idx);
-  if(m) m.setIcon(mkIcon(LOCS[idx], doneSet.has(idx)));
-}
-
-function buildTree() {
-  treeWrap.innerHTML = '';
-  Object.entries(CAT_GROUPS).forEach(([groupName, types]) => {
-    const validTypes = types.filter(t => typeList.includes(t));
-    if(!validTypes.length) return;
-    const catDiv = document.createElement('div');
-    catDiv.className = 'tree-cat';
-    const header = document.createElement('div');
-    header.className = 'tree-cat-header';
-    const check = document.createElement('div');
-    check.className = 'cat-check checked';
-    const allActive = validTypes.every(t => activeTypes.has(t));
-    if(!allActive) check.classList.remove('checked');
-    const totalCount = validTypes.reduce((s,t) => s + LOCS.filter(l=>l.type===t).length, 0);
-    header.innerHTML = '';
-    header.appendChild(check);
-    const labelSpan = document.createElement('span');
-    labelSpan.innerHTML = `${groupName} <span class="cat-count">${totalCount}</span>`;
-    header.appendChild(labelSpan);
-    const arrow = document.createElement('span');
-    arrow.className = 'cat-arrow'; arrow.textContent = '▶';
-    header.appendChild(arrow);
-    header.classList.add('open');
-
-    // Declare itemsList here so check.onclick can safely reference it
-    const itemsList = document.createElement('div');
-    itemsList.className = 'tree-items open';
-
-    // Helper: sync parent checkbox to whether all sub-types are active
-    const syncParentCheck = () => {
-      const allOn = validTypes.every(t => activeTypes.has(t));
-      const anyOn = validTypes.some(t => activeTypes.has(t));
-      if(allOn) check.classList.add('checked');
-      else check.classList.remove('checked');
-    };
-
-    check.onclick = (e) => {
-      e.stopPropagation();
-      const nowChecked = check.classList.contains('checked');
-      if(nowChecked) {
-        check.classList.remove('checked');
-        validTypes.forEach(t => { activeTypes.delete(t); map.removeLayer(groups[t]); });
-        itemsList.querySelectorAll('.type-check').forEach(tc => tc.classList.remove('checked'));
-      } else {
-        check.classList.add('checked');
-        validTypes.forEach(t => { activeTypes.add(t); groups[t].addTo(map); });
-        itemsList.querySelectorAll('.type-check').forEach(tc => tc.classList.add('checked'));
-      }
-    };
-    header.onclick = (e) => {
-      if(e.target === check) return;
-      const isOpen = itemsList.classList.contains('open');
-      itemsList.classList.toggle('open');
-      if(isOpen) header.classList.remove('open');
-      else header.classList.add('open');
-    };
-
-    validTypes.forEach(type => {
-      const c = COLORS[type] || '#aaa';
-      const cnt = LOCS.filter(l=>l.type===type).length;
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;padding:4px 16px 4px 16px;gap:8px;';
-      const tc = document.createElement('div');
-      tc.className = 'cat-check type-check checked';
-      tc.style.cssText = `width:13px;height:13px;border-radius:3px;border:1.5px solid ${c};flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;`;
-      tc.innerHTML = `<span style="font-size:8px;color:#000;font-weight:900;display:none;">✓</span>`;
-      const updateCheck = () => {
-        const on = activeTypes.has(type);
-        tc.style.background = on ? c : 'transparent';
-        tc.querySelector('span').style.display = on ? '' : 'none';
-      };
-      updateCheck();
-      tc.onclick = () => {
-        if(activeTypes.has(type)){ activeTypes.delete(type); map.removeLayer(groups[type]); }
-        else { activeTypes.add(type); groups[type].addTo(map); }
-        updateCheck();
-        syncParentCheck();
-      };
-      const typeLabel = document.createElement('div');
-      typeLabel.style.cssText = 'font-size:11px;flex:1;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:default;';
-      typeLabel.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:${c};display:inline-block;flex-shrink:0;"></span><span>${EMOJI[type]||''} ${type}</span>`;
-      const cntBadge = document.createElement('span');
-      cntBadge.style.cssText = 'font-size:10px;color:var(--muted);font-weight:400;';
-      cntBadge.textContent = cnt;
-      row.appendChild(tc); row.appendChild(typeLabel); row.appendChild(cntBadge);
-      itemsList.appendChild(row);
-
-      // Named sub-items with completion checkboxes
-      const typeItems = LOCS.filter((l,i) => l.type===type && (l.desc || l.title));
-      if(typeItems.length <= 60 && typeItems.length > 0) {
-        typeItems.forEach((loc) => {
-          const realIdx = LOCS.indexOf(loc);
-          const item = document.createElement('div');
-          item.className = 'tree-item';
-          if(doneSet.has(realIdx)) item.style.opacity = '0.45';
-          item.dataset.idx = realIdx;
-          const dot = `<div class="item-dot" style="background:${c}"></div>`;
-          const name = `<span class="item-name">${loc.title}</span>`;
-          const doneBox = `<div class="item-done${doneSet.has(realIdx)?' checked':''}"></div>`;
-          item.innerHTML = dot + name + doneBox;
-          // click name/dot area → fly + detail
-          item.addEventListener('click', (e) => {
-            if(e.target.classList.contains('item-done')) return;
-            document.querySelectorAll('.tree-item').forEach(x=>x.classList.remove('active'));
-            item.classList.add('active');
-            flyTo(realIdx);
-            showDetail(realIdx);
-          });
-          // click checkbox → toggle done
-          item.querySelector('.item-done').addEventListener('click', (e) => {
-            e.stopPropagation();
-            const box = e.target;
-            if(doneSet.has(realIdx)) {
-              doneSet.delete(realIdx);
-              box.classList.remove('checked');
-              item.style.opacity = '1';
-            } else {
-              doneSet.add(realIdx);
-              box.classList.add('checked');
-              item.style.opacity = '0.45';
-            }
-            saveDone(doneSet);
-            updateProgress();
-            refreshMarkerIcon(realIdx);
-          });
-          itemsList.appendChild(item);
-        });
-      }
-    });
-    catDiv.appendChild(header);
-    catDiv.appendChild(itemsList);
-    treeWrap.appendChild(catDiv);
-  });
-}
-buildTree();
-
-// Expand / Collapse All — safe wiring after buildTree populates the DOM
-const btnExp = document.getElementById('btn-expand-all');
-const btnCol = document.getElementById('btn-collapse-all');
-if(btnExp) btnExp.onclick = () => {
-  document.querySelectorAll('.tree-items').forEach(el => el.classList.add('open'));
-  document.querySelectorAll('.tree-cat-header').forEach(el => el.classList.add('open'));
-};
-if(btnCol) btnCol.onclick = () => {
-  document.querySelectorAll('.tree-items').forEach(el => el.classList.remove('open'));
-  document.querySelectorAll('.tree-cat-header').forEach(el => el.classList.remove('open'));
-};
-
-// ─── FLY TO + DETAIL ─────────────────────────────────────────────────────────
-const ZOOM_FOR_TYPE = {
-  "Spaceship Part":7,"Nuclear Waste":7,"Hidden Package":7,
-  "Easter Egg":7,"Epsilon Car":7,"Epsilon Tract":7,
-  "Safehouse":7,"Hospital":7,"Police Station":7,"Airport":6,
-  "Landmark":5,"Gang Territory":5,"Property":6,"Activity":6,
-  "Main Mission":6,"Heist Setup":6,"Strangers & Freaks":6,"Assassination":6,
-  "Vehicle Spawn":7
-};
-function flyTo(idx) {
-  const loc = LOCS[idx];
-  const z = ZOOM_FOR_TYPE[loc.type] || 6;
-  map.flyTo([loc.lat, loc.lng], z, {duration:0.8});
-}
-
-function showDetail(idx) {
-  const loc = LOCS[idx];
-  const c = getMissionColor(loc);
-  document.getElementById('dc-tag').innerHTML = `<span style="color:${c}">${EMOJI[loc.type]||'📍'} ${loc.type}</span>`;
-  document.getElementById('dc-title').textContent = loc.title;
-  const charEl = document.getElementById('dc-char');
-  if(loc.char) {
-    charEl.textContent = `Character: ${loc.char}`;
-    charEl.style.color = getMissionColor(loc);
-  } else {
-    charEl.textContent = '';
-    charEl.style.color = '';
-  }
-  document.getElementById('dc-desc').textContent = loc.desc || 'No description available.';
-  const imgBox = document.getElementById('dc-imgs');
-  imgBox.innerHTML = '';
-  if(loc.imgs && loc.imgs.length) {
-    loc.imgs.forEach(url => {
-      const img = document.createElement('img');
-      img.src = url; img.alt = loc.title;
-      img.onerror = () => img.style.display='none';
-      imgBox.appendChild(img);
-    });
-  }
-  document.getElementById('detail-card').classList.add('visible');
-  document.getElementById('tree-wrap').classList.add('card-open');
-  setTimeout(() => {
-    const m = markerMap.get(idx);
-    if(m) m.openPopup();
-  }, 850);
-}
-
-document.getElementById('dc-close').onclick = () => {
-  document.getElementById('detail-card').classList.remove('visible');
-  document.getElementById('tree-wrap').classList.remove('card-open');
-  document.querySelectorAll('.tree-item').forEach(x => x.classList.remove('active'));
-};
-
-// ─── SEARCH ───────────────────────────────────────────────────────────────────
-const sinput = document.getElementById('search-input');
-const sresults = document.getElementById('search-results');
-sinput.addEventListener('input', () => {
-  const q = sinput.value.trim().toLowerCase();
-  sresults.innerHTML = '';
-  if(!q){ sresults.style.display='none'; return; }
-  const hits = LOCS.map((l,i)=>({l,i})).filter(({l}) =>
-    l.title.toLowerCase().includes(q) ||
-    l.type.toLowerCase().includes(q) ||
-    (l.desc||'').toLowerCase().includes(q) ||
-    (l.char||'').toLowerCase().includes(q)
-  ).slice(0,14);
-  if(!hits.length){ sresults.style.display='none'; return; }
-  hits.forEach(({l,i}) => {
-    const c = COLORS[l.type] || '#aaa';
-    const d = document.createElement('div');
-    d.className = 'sr-item';
-    d.innerHTML = `<div class="sr-name">${l.title}</div>
-      <div class="sr-meta"><span class="sr-dot" style="background:${c}"></span>${l.type}${l.char?` · <span style="color:#f7c948">${l.char}</span>`:''}</div>`;
-    d.onclick = () => {
-      sresults.style.display='none'; sinput.value='';
-      flyTo(i); showDetail(i);
-      document.querySelectorAll('.tree-item').forEach(x=>x.classList.remove('active'));
-      const treeItem = document.querySelector(`.tree-item[data-idx="${i}"]`);
-      if(treeItem){
-        // Ensure the parent items list is open
-        const parentList = treeItem.closest('.tree-items');
-        if(parentList && !parentList.classList.contains('open')) {
-          parentList.classList.add('open');
-          const parentHeader = parentList.previousElementSibling;
-          if(parentHeader) parentHeader.classList.add('open');
-        }
-        treeItem.classList.add('active');
-        treeItem.scrollIntoView({block:'nearest'});
-      }
-    };
-    sresults.appendChild(d);
-  });
-  sresults.style.display = 'block';
-});
-document.addEventListener('click', e => {
-  if(!sinput.contains(e.target) && !sresults.contains(e.target))
-    sresults.style.display='none';
-});
-
-// ─── COORDS ───────────────────────────────────────────────────────────────────
-map.on('mousemove', e => {
-  document.getElementById('coords').textContent =
-    `${e.latlng.lat.toFixed(2)}° ${e.latlng.lng.toFixed(2)}°  Z${map.getZoom()}`;
-});
-</script>
+  <!-- App modules (order matters) -->
+  <script src="src/js/data/locations.js"></script>
+  <script src="src/js/data/colors.js"></script>
+  <script src="src/js/data/categories.js"></script>
+  <script src="src/js/storage.js"></script>
+  <script src="src/js/map.js"></script>
+  <script src="src/js/markers.js"></script>
+  <script src="src/js/detail.js"></script>
+  <script src="src/js/tree.js"></script>
+  <script src="src/js/search.js"></script>
+  <script src="src/js/main.js"></script>
 </body>
 </html>

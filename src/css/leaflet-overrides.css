@@ -1,0 +1,49 @@
+/* ──────────────────────────────────────────────────────────────────────────────
+   leaflet-overrides.css  –  Theming Leaflet's built-in controls to match the
+                              dark GTA V aesthetic.
+   ────────────────────────────────────────────────────────────────────────────── */
+
+/* ── Zoom control ── */
+.leaflet-control-zoom {
+  border:        1px solid var(--border) !important;
+  border-radius: 8px !important;
+  overflow:      hidden;
+}
+
+.leaflet-control-zoom a {
+  background:   rgba(10, 12, 16, 0.92) !important;
+  color:        #c9d1d9 !important;
+  border-bottom: 1px solid var(--border) !important;
+  width:        30px !important;
+  height:       30px !important;
+  line-height:  30px !important;
+}
+
+.leaflet-control-zoom a:hover { background: rgba(255, 255, 255, 0.1) !important; }
+
+/* ── Attribution ── */
+.leaflet-control-attribution {
+  background: rgba(10, 12, 16, 0.7) !important;
+  color:      #444 !important;
+  font-size:  9px !important;
+}
+
+/* ── Popup bubble ── */
+.leaflet-popup-content-wrapper {
+  background:   #161b22 !important;
+  border:       1px solid var(--border) !important;
+  border-radius: 12px !important;
+  padding:      0 !important;
+  box-shadow:   0 8px 32px rgba(0, 0, 0, 0.6) !important;
+  min-width:    180px;
+}
+
+.leaflet-popup-tip          { background: #161b22 !important; }
+.leaflet-popup-content      { margin: 0 !important; color: var(--text) !important; }
+
+.leaflet-popup-close-button {
+  color:     var(--muted) !important;
+  top:       8px !important;
+  right:     8px !important;
+  font-size: 16px !important;
+}
