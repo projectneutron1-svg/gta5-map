@@ -1422,6 +1422,12 @@ searchInput.addEventListener('keydown', (e) => {
 // Static lists; no map markers. Appended to #tree-wrap after buildTree().
 // ════════════════════════════════════════════════════════════
 
+
+// Character portrait images (raw GitHub SVG/PNG assets)
+const CHAR_PORTRAITS = {
+  'Michael De Santa': 'https://raw.githubusercontent.com/projectneutron1-svg/gta5-map/main/src/assets/michael.svg',
+};
+
 const INFO_SECTIONS = {
 
   // ── CHARACTERS ──────────────────────────────────────────────────────────────
@@ -1959,15 +1965,27 @@ function openInfoPanel(section, group, name, note, color) {
   rpTitle.textContent = name;
   rp.classList.remove('rp-hidden');
 
+  const portrait = CHAR_PORTRAITS[name];
+  const avatarHtml = portrait
+    ? `<div style="flex-shrink:0;width:90px;height:112px;border-radius:10px;overflow:hidden;border:2px solid ${color}40;background:#1a2035;">
+        <img src="${portrait}" alt="${name}" style="width:100%;height:100%;object-fit:cover;object-position:top center;"
+          onerror="this.parentElement.innerHTML='<div style=\'display:flex;align-items:center;justify-content:center;width:90px;height:112px;font-size:28px;font-weight:500;color:${color}\'>${name.charAt(0)}</div>'"/>
+       </div>`
+    : `<div style="flex-shrink:0;width:44px;height:44px;border-radius:50%;background:${color}25;border:1.5px solid ${color}50;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:500;color:${color}">${name.charAt(0)}</div>`;
+
   rpBody.innerHTML =
     `<div style="padding:1.25rem 0">` +
     `<div style="background:var(--color-bg-p);border:0.5px solid var(--color-border);border-radius:12px;overflow:hidden">` +
     `<div style="background:#1a1a2e;padding:1.25rem 1.5rem;border-bottom:0.5px solid rgba(255,255,255,0.08)">` +
-    `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">` +
+    `<div style="display:flex;align-items:flex-start;gap:14px">` +
+    avatarHtml +
+    `<div style="flex:1;min-width:0">` +
+    `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">` +
     `<span style="font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:${color};background:${color}20;border:0.5px solid ${color}40;border-radius:4px;padding:2px 8px;">${section} › ${group}</span>` +
     `</div>` +
     `<h2 style="font-size:20px;font-weight:500;color:#fff;margin:0 0 6px">${name}</h2>` +
     (note ? `<p style="font-size:13px;color:rgba(255,255,255,0.5);margin:0;line-height:1.5">${note}</p>` : '') +
+    `</div></div>` +
     `</div>` +
     `<div style="padding:1.25rem 1.5rem">` +
     `<div style="background:rgba(247,201,72,0.06);border:0.5px solid rgba(247,201,72,0.2);border-radius:8px;padding:10px 12px">` +
