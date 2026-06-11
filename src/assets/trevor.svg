@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" width="240" height="300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a0e00"/>
+      <stop offset="100%" style="stop-color:#120a00"/>
+    </linearGradient>
+    <linearGradient id="fade" x1="0%" y1="55%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117;stop-opacity:0"/>
+      <stop offset="100%" style="stop-color:#0d1117;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="300" fill="url(#bg)"/>
+  <!-- body — dirty white tee -->
+  <path d="M10 300 L10 195 Q25 178 68 170 L92 166 Q120 160 148 166 L172 170 Q215 178 230 195 L230 300Z" fill="#c8b898"/>
+  <!-- tee collar -->
+  <path d="M96 168 L106 186 L120 180 L134 186 L144 168 L120 174Z" fill="#b8a888"/>
+  <!-- dirt/wear on tee -->
+  <ellipse cx="100" cy="220" rx="12" ry="8" fill="#8a7858" opacity="0.3"/>
+  <ellipse cx="155" cy="240" rx="8" ry="5" fill="#8a7858" opacity="0.25"/>
+  <!-- neck — thicker, rougher -->
+  <rect x="106" y="150" width="28" height="20" rx="5" fill="#c09060"/>
+  <!-- stubble shadow on neck -->
+  <rect x="106" y="155" width="28" height="15" rx="3" fill="#8a6030" opacity="0.25"/>
+  <!-- ears — large -->
+  <ellipse cx="68" cy="112" rx="8" ry="11" fill="#b08050"/>
+  <ellipse cx="68" cy="112" rx="5" ry="7" fill="#906030" opacity="0.5"/>
+  <ellipse cx="172" cy="112" rx="8" ry="11" fill="#b08050"/>
+  <!-- head — longer face, stronger jaw -->
+  <path d="M72 90 Q72 60 120 54 Q168 60 168 90 L168 148 Q165 172 120 174 Q75 172 72 148Z" fill="#c09060"/>
+  <!-- very short hair / almost shaved -->
+  <path d="M74 90 Q78 62 120 57 Q162 62 166 90 Q162 72 120 69 Q78 72 74 90Z" fill="#3a2a1a"/>
+  <path d="M74 90 Q70 100 72 114 Q74 102 78 93Z" fill="#3a2a1a"/>
+  <path d="M166 90 Q170 100 168 114 Q166 102 162 93Z" fill="#3a2a1a"/>
+  <!-- wild/unkempt patches -->
+  <path d="M90 68 Q105 62 120 61 Q110 65 100 70Z" fill="#2a1a0a" opacity="0.7"/>
+  <!-- heavy brow ridge -->
+  <path d="M78 94 Q98 86 110 90" stroke="#2a1a0a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+  <path d="M130 90 Q142 86 162 94" stroke="#2a1a0a" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+  <!-- brow furrow lines -->
+  <path d="M116 90 L120 96 L124 90" stroke="#2a1a0a" stroke-width="1.5" fill="none" opacity="0.5"/>
+  <!-- deep-set eyes — intense/unhinged look -->
+  <ellipse cx="96" cy="106" rx="12" ry="8" fill="#d0c0a0"/>
+  <ellipse cx="144" cy="106" rx="12" ry="8" fill="#d0c0a0"/>
+  <!-- eye shadow / sunken -->
+  <ellipse cx="96" cy="104" rx="14" ry="10" fill="#8a6030" opacity="0.3"/>
+  <ellipse cx="144" cy="104" rx="14" ry="10" fill="#8a6030" opacity="0.3"/>
+  <!-- irises — grey-blue, wild -->
+  <circle cx="97"  cy="107" r="5.5" fill="#5a7888"/>
+  <circle cx="145" cy="107" r="5.5" fill="#5a7888"/>
+  <circle cx="97"  cy="107" r="3.2" fill="#1a1008"/>
+  <circle cx="145" cy="107" r="3.2" fill="#1a1008"/>
+  <circle cx="99"  cy="105" r="1.3" fill="rgba(255,255,255,0.7)"/>
+  <circle cx="147" cy="105" r="1.3" fill="rgba(255,255,255,0.7)"/>
+  <!-- eyelids heavy -->
+  <path d="M85 102 Q96 97 108 102" stroke="#2a1a0a" stroke-width="2" fill="none" opacity="0.9"/>
+  <path d="M133 102 Q144 97 156 102" stroke="#2a1a0a" stroke-width="2" fill="none" opacity="0.9"/>
+  <!-- bags under eyes -->
+  <path d="M86 112 Q96 116 107 112" stroke="#9a7040" stroke-width="1.2" fill="none" opacity="0.6"/>
+  <path d="M134 112 Q144 116 155 112" stroke="#9a7040" stroke-width="1.2" fill="none" opacity="0.6"/>
+  <!-- large, crooked nose -->
+  <path d="M114 110 L110 132 Q115 138 120 138 Q125 138 130 132 L126 110" fill="none" stroke="#907040" stroke-width="1.5" opacity="0.6"/>
+  <ellipse cx="120" cy="136" rx="9" ry="5" fill="#a07840" opacity="0.6"/>
+  <ellipse cx="112" cy="136" rx="5" ry="4" fill="#804020" opacity="0.8"/>
+  <ellipse cx="128" cy="136" rx="5" ry="4" fill="#804020" opacity="0.8"/>
+  <!-- heavy stubble / beard shadow -->
+  <path d="M80 128 Q80 162 120 170 Q160 162 160 128 Q155 160 120 165 Q85 160 80 128Z" fill="#2a1a08" opacity="0.35"/>
+  <!-- mouth — sneer/smirk -->
+  <path d="M102 146 Q111 141 120 143 Q129 141 138 146 Q131 152 120 150 Q109 152 102 146Z" fill="#904030"/>
+  <path d="M103 146 Q120 140 137 146" stroke="#601a08" stroke-width="1.2" fill="none" opacity="0.9"/>
+  <!-- smirk asymmetry -->
+  <path d="M137 146 Q141 143 143 146" stroke="#601a08" stroke-width="1" fill="none" opacity="0.6"/>
+  <!-- forehead lines -->
+  <path d="M88 85 Q120 82 152 85" stroke="#9a7040" stroke-width="0.7" fill="none" opacity="0.35"/>
+  <path d="M92 91 Q120 88 148 91" stroke="#9a7040" stroke-width="0.7" fill="none" opacity="0.25"/>
+  <!-- jaw definition — very square -->
+  <path d="M76 138 Q74 158 82 166 Q100 175 120 176 Q140 175 158 166 Q166 158 164 138" fill="none" stroke="#907040" stroke-width="0.8" opacity="0.3"/>
+  <!-- orange accent -->
+  <rect width="240" height="300" fill="rgba(249,115,22,0.04)"/>
+  <!-- fade -->
+  <rect width="240" height="300" fill="url(#fade)"/>
+  <!-- badge -->
+  <rect x="16" y="258" width="208" height="28" rx="6" fill="rgba(249,115,22,0.15)" stroke="rgba(249,115,22,0.3)" stroke-width="0.5"/>
+  <text x="120" y="276" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="500" fill="#fdba74">Trevor Philips</text>
+</svg>
