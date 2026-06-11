@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" width="240" height="300">
+  <defs>
+    <clipPath id="face-clip">
+      <rect x="60" y="30" width="120" height="130" rx="8"/>
+    </clipPath>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1b2a"/>
+      <stop offset="100%" style="stop-color:#1a2a3a"/>
+    </linearGradient>
+    <linearGradient id="suit-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a4a5a"/>
+      <stop offset="100%" style="stop-color:#2a2a38"/>
+    </linearGradient>
+    <linearGradient id="fade-bot" x1="0%" y1="60%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117;stop-opacity:0"/>
+      <stop offset="100%" style="stop-color:#0d1117;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="shirt-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#c8c8cc"/>
+      <stop offset="100%" style="stop-color:#e8e8f0"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="240" height="300" fill="url(#bg-grad)"/>
+  
+  <!-- Subtle vignette corners -->
+  <rect width="240" height="300" fill="rgba(0,0,0,0.3)" opacity="0.4"/>
+  
+  <!-- ── BODY / SUIT ── -->
+  <!-- Shoulders -->
+  <path d="M20 300 L20 195 Q30 180 70 172 L90 168 Q120 162 150 168 L170 172 Q210 180 220 195 L220 300 Z" fill="url(#suit-grad)"/>
+  <!-- Suit lapels -->
+  <path d="M90 168 L100 200 L120 210 L140 200 L150 168 L120 178 Z" fill="#3a3a4a"/>
+  <!-- White shirt / tie area -->
+  <path d="M100 200 L120 210 L140 200 L135 240 L120 250 L105 240 Z" fill="url(#shirt-grad)" opacity="0.9"/>
+  <!-- Tie -->
+  <path d="M116 202 L120 208 L124 202 L121 245 L120 248 L119 245 Z" fill="#2a3a5a"/>
+  <!-- Suit jacket inner shadow -->
+  <path d="M90 168 L80 240 L95 250 L105 240 L100 200 Z" fill="#252535" opacity="0.6"/>
+  <path d="M150 168 L160 240 L145 250 L140 200 Z" fill="#252535" opacity="0.6"/>
+  <!-- Collar -->
+  <path d="M100 178 L108 192 L120 185 L132 192 L140 178" fill="none" stroke="#d0d0da" stroke-width="2" opacity="0.7"/>
+  
+  <!-- ── NECK ── -->
+  <rect x="108" y="150" width="24" height="22" rx="5" fill="#c4a882"/>
+  
+  <!-- ── HEAD ── -->
+  <!-- Head shape -->
+  <ellipse cx="120" cy="110" rx="52" ry="62" fill="#c4a882"/>
+  <!-- Ear left -->
+  <ellipse cx="69" cy="110" rx="7" ry="10" fill="#b89872"/>
+  <!-- Ear right -->
+  <ellipse cx="171" cy="110" rx="7" ry="10" fill="#b89872"/>
+  <!-- Ear inner left -->
+  <ellipse cx="69" cy="110" rx="4" ry="6" fill="#a08060" opacity="0.6"/>
+  
+  <!-- ── HAIR ── -->
+  <!-- Main dark hair -->
+  <path d="M70 85 Q75 55 120 50 Q165 55 170 85 Q165 65 120 62 Q75 65 70 85 Z" fill="#2a2520"/>
+  <!-- Hair sides -->
+  <path d="M70 85 Q65 95 68 108 Q70 95 75 88 Z" fill="#2a2520"/>
+  <path d="M170 85 Q175 95 172 108 Q170 95 165 88 Z" fill="#2a2520"/>
+  <!-- Hair detail / part -->
+  <path d="M100 60 Q115 56 120 56 Q118 60 115 63 Q108 61 100 60 Z" fill="#1a1510" opacity="0.6"/>
+  <!-- Gray streaks at temples -->
+  <path d="M72 86 Q74 78 80 75 Q76 82 74 90 Z" fill="#8a8078" opacity="0.8"/>
+  <path d="M168 86 Q166 78 160 75 Q164 82 166 90 Z" fill="#8a8078" opacity="0.8"/>
+  
+  <!-- ── FACE FEATURES ── -->
+  <!-- Slight stubble / jaw shadow -->
+  <ellipse cx="120" cy="148" rx="42" ry="14" fill="#2a2520" opacity="0.2"/>
+  
+  <!-- Eyebrows - heavy, slightly furrowed -->
+  <path d="M88 94 Q98 89 108 91" stroke="#2a2520" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <path d="M132 91 Q142 89 152 94" stroke="#2a2520" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  
+  <!-- Eyes - slightly squinting, determined look -->
+  <!-- Eye sockets shadow -->
+  <ellipse cx="98" cy="103" rx="13" ry="9" fill="#a88c6a" opacity="0.5"/>
+  <ellipse cx="142" cy="103" rx="13" ry="9" fill="#a88c6a" opacity="0.5"/>
+  <!-- Whites -->
+  <ellipse cx="98" cy="103" rx="11" ry="7" fill="#e8e0d0"/>
+  <ellipse cx="142" cy="103" rx="11" ry="7" fill="#e8e0d0"/>
+  <!-- Irises - green/blue (artwork shows blue) -->
+  <circle cx="98" cy="104" r="5.5" fill="#4a7090"/>
+  <circle cx="142" cy="104" r="5.5" fill="#4a7090"/>
+  <!-- Pupils -->
+  <circle cx="98" cy="104" r="3" fill="#1a1a1a"/>
+  <circle cx="142" cy="104" r="3" fill="#1a1a1a"/>
+  <!-- Eye shine -->
+  <circle cx="100" cy="102" r="1.2" fill="rgba(255,255,255,0.7)"/>
+  <circle cx="144" cy="102" r="1.2" fill="rgba(255,255,255,0.7)"/>
+  <!-- Upper eyelids -->
+  <path d="M87 99 Q98 95 109 99" stroke="#2a2520" stroke-width="1.5" fill="none" opacity="0.8"/>
+  <path d="M131 99 Q142 95 153 99" stroke="#2a2520" stroke-width="1.5" fill="none" opacity="0.8"/>
+  <!-- Lower eyelids / bags (age) -->
+  <path d="M88 108 Q98 112 108 108" stroke="#b09070" stroke-width="1" fill="none" opacity="0.6"/>
+  <path d="M132 108 Q142 112 152 108" stroke="#b09070" stroke-width="1" fill="none" opacity="0.6"/>
+  
+  <!-- Nose -->
+  <path d="M115 108 L112 128 Q116 133 120 133 Q124 133 128 128 L125 108" fill="none" stroke="#b09070" stroke-width="1.2" opacity="0.7"/>
+  <!-- Nose tip -->
+  <ellipse cx="120" cy="131" rx="7" ry="4" fill="#b89870" opacity="0.5"/>
+  <!-- Nostrils -->
+  <ellipse cx="114" cy="131" rx="4" ry="3" fill="#a07858" opacity="0.7"/>
+  <ellipse cx="126" cy="131" rx="4" ry="3" fill="#a07858" opacity="0.7"/>
+  
+  <!-- Mouth - slight frown / neutral serious expression -->
+  <!-- Lips -->
+  <path d="M105 142 Q113 138 120 140 Q127 138 135 142 Q127 148 120 146 Q113 148 105 142 Z" fill="#c09070"/>
+  <!-- Upper lip line -->
+  <path d="M107 141 Q120 136 133 141" stroke="#8a6040" stroke-width="1.2" fill="none" opacity="0.8"/>
+  <!-- Mouth line -->
+  <path d="M106 142 Q120 145 134 142" stroke="#7a5030" stroke-width="1" fill="none" opacity="0.7"/>
+  
+  <!-- Jaw / chin definition -->
+  <path d="M78 130 Q80 155 90 162 Q105 170 120 170 Q135 170 150 162 Q160 155 162 130" fill="none" stroke="#a08060" stroke-width="0.8" opacity="0.4"/>
+  
+  <!-- Nasolabial folds (age lines) -->
+  <path d="M104 131 Q100 138 104 143" stroke="#a07850" stroke-width="1" fill="none" opacity="0.4"/>
+  <path d="M136 131 Q140 138 136 143" stroke="#a07850" stroke-width="1" fill="none" opacity="0.4"/>
+  
+  <!-- Forehead line -->
+  <path d="M92 88 Q120 85 148 88" stroke="#a08060" stroke-width="0.8" fill="none" opacity="0.3"/>
+  
+  <!-- ── BLUE ACCENT GLOW (character color) ── -->
+  <rect x="0" y="0" width="240" height="300" fill="rgba(59,130,246,0.04)"/>
+  
+  <!-- Bottom fade to match card bg -->
+  <rect width="240" height="300" fill="url(#fade-bot)"/>
+  
+  <!-- ── NAME BADGE at bottom ── -->
+  <rect x="16" y="258" width="208" height="28" rx="6" fill="rgba(59,130,246,0.15)" stroke="rgba(59,130,246,0.3)" stroke-width="0.5"/>
+  <text x="120" y="276" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="500" fill="#93c5fd">Michael De Santa</text>
+</svg>
