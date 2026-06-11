@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" width="240" height="300">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a1a12"/>
+      <stop offset="100%" style="stop-color:#0d2018"/>
+    </linearGradient>
+    <linearGradient id="fade" x1="0%" y1="55%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117;stop-opacity:0"/>
+      <stop offset="100%" style="stop-color:#0d1117;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="shirt" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a2a1a"/>
+      <stop offset="100%" style="stop-color:#0f1a0f"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="300" fill="url(#bg)"/>
+  <!-- body / hoodie -->
+  <path d="M15 300 L15 198 Q30 182 72 174 L95 170 Q120 165 145 170 L168 174 Q210 182 225 198 L225 300Z" fill="#1a2a1a"/>
+  <!-- hoodie strings -->
+  <line x1="112" y1="178" x2="108" y2="210" stroke="#2a3a2a" stroke-width="2"/>
+  <line x1="128" y1="178" x2="132" y2="210" stroke="#2a3a2a" stroke-width="2"/>
+  <!-- collar -->
+  <path d="M95 172 L108 188 L120 182 L132 188 L145 172 L120 176Z" fill="#253025"/>
+  <!-- neck -->
+  <rect x="109" y="152" width="22" height="22" rx="4" fill="#6b4c2a"/>
+  <!-- ears -->
+  <ellipse cx="70" cy="112" rx="7" ry="10" fill="#5e4020"/>
+  <ellipse cx="70" cy="112" rx="4" ry="6" fill="#4a3018" opacity="0.6"/>
+  <ellipse cx="170" cy="112" rx="7" ry="10" fill="#5e4020"/>
+  <!-- head -->
+  <ellipse cx="120" cy="112" rx="50" ry="60" fill="#6b4c2a"/>
+  <!-- short hair / fade -->
+  <path d="M72 88 Q76 58 120 54 Q164 58 168 88 Q162 68 120 65 Q78 68 72 88Z" fill="#1a1208"/>
+  <path d="M72 88 Q68 98 70 110 Q72 98 76 90Z" fill="#1a1208"/>
+  <path d="M168 88 Q172 98 170 110 Q168 98 164 90Z" fill="#1a1208"/>
+  <!-- tight fade line -->
+  <path d="M74 100 Q76 92 84 88" stroke="#0d0a04" stroke-width="2" fill="none" opacity="0.7"/>
+  <path d="M166 100 Q164 92 156 88" stroke="#0d0a04" stroke-width="2" fill="none" opacity="0.7"/>
+  <!-- eyebrows -->
+  <path d="M88 96 Q98 92 108 94" stroke="#1a1208" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M132 94 Q142 92 152 96" stroke="#1a1208" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- eyes -->
+  <ellipse cx="98" cy="104" rx="11" ry="7" fill="#e0d0b0"/>
+  <ellipse cx="142" cy="104" rx="11" ry="7" fill="#e0d0b0"/>
+  <circle cx="98"  cy="105" r="5" fill="#2a1a08"/>
+  <circle cx="142" cy="105" r="5" fill="#2a1a08"/>
+  <circle cx="98"  cy="105" r="3" fill="#0d0a04"/>
+  <circle cx="142" cy="105" r="3" fill="#0d0a04"/>
+  <circle cx="100" cy="103" r="1.2" fill="rgba(255,255,255,0.65)"/>
+  <circle cx="144" cy="103" r="1.2" fill="rgba(255,255,255,0.65)"/>
+  <path d="M88 100 Q98 96 108 100" stroke="#1a1208" stroke-width="1.2" fill="none" opacity="0.7"/>
+  <path d="M132 100 Q142 96 152 100" stroke="#1a1208" stroke-width="1.2" fill="none" opacity="0.7"/>
+  <!-- nose -->
+  <path d="M116 110 L113 128 Q117 134 120 134 Q123 134 127 128 L124 110" fill="none" stroke="#4a3010" stroke-width="1.2" opacity="0.6"/>
+  <ellipse cx="120" cy="132" rx="7" ry="4" fill="#5a3a18" opacity="0.5"/>
+  <ellipse cx="114" cy="132" rx="3.5" ry="2.8" fill="#3a2008" opacity="0.7"/>
+  <ellipse cx="126" cy="132" rx="3.5" ry="2.8" fill="#3a2008" opacity="0.7"/>
+  <!-- mouth -->
+  <path d="M106 142 Q113 139 120 141 Q127 139 134 142 Q127 148 120 146 Q113 148 106 142Z" fill="#5a3818"/>
+  <path d="M107 142 Q120 138 133 142" stroke="#3a2008" stroke-width="1" fill="none" opacity="0.8"/>
+  <!-- jaw shadow -->
+  <ellipse cx="120" cy="150" rx="40" ry="12" fill="#2a1a08" opacity="0.18"/>
+  <!-- green accent glow -->
+  <rect width="240" height="300" fill="rgba(16,185,129,0.04)"/>
+  <!-- fade -->
+  <rect width="240" height="300" fill="url(#fade)"/>
+  <!-- badge -->
+  <rect x="16" y="258" width="208" height="28" rx="6" fill="rgba(16,185,129,0.15)" stroke="rgba(16,185,129,0.3)" stroke-width="0.5"/>
+  <text x="120" y="276" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="500" fill="#6ee7b7">Franklin Clinton</text>
+</svg>
