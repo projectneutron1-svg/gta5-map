@@ -1300,18 +1300,7 @@ document.getElementById('btn-collapse-all').addEventListener('click', () => {
 });
 
 
-buildTree();
-
-const btnExp = document.getElementById('btn-expand-all');
-const btnCol = document.getElementById('btn-collapse-all');
-if(btnExp) btnExp.onclick = () => {
-  document.querySelectorAll('.tree-items').forEach(el => el.classList.add('open'));
-  document.querySelectorAll('.tree-cat-header').forEach(el => el.classList.add('open'));
-};
-if(btnCol) btnCol.onclick = () => {
-  document.querySelectorAll('.tree-items').forEach(el => el.classList.remove('open'));
-  document.querySelectorAll('.tree-cat-header').forEach(el => el.classList.remove('open'));
-};
+// duplicate buildTree removed
 
 // ════════════════════════════════════════════════════════════
 // 10. SEARCH
@@ -1423,6 +1412,579 @@ searchInput.addEventListener('keydown', (e) => {
 
 
 // ════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════
+// INFO SECTIONS — injected
+// ════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════
+// INFO SECTIONS — Characters, Weapons, Vehicles
+// Static lists; no map markers. Appended to #tree-wrap after buildTree().
+// ════════════════════════════════════════════════════════════
+
+const INFO_SECTIONS = {
+
+  // ── CHARACTERS ──────────────────────────────────────────────────────────────
+  'Characters': {
+    icon: '👤', color: '#a78bfa',
+    groups: {
+      'Main Protagonists': [
+        { name:'Michael De Santa', note:'Retired bank robber, alias Townley. Story lead.' },
+        { name:'Trevor Philips',   note:'Methamphetamine manufacturer, psychopath, Sandy Shores.' },
+        { name:'Franklin Clinton', note:'South LS repo man turned high-level criminal.' },
+      ],
+      'Family': [
+        { name:'Amanda De Santa',   note:"Michael's wife. Has affair with tennis coach Kyle." },
+        { name:'Jimmy De Santa',    note:"Michael's lazy son. Sells Michael's yacht for drug money." },
+        { name:'Tracey De Santa',   note:"Michael's daughter. Auditions for Fame or Shame." },
+      ],
+      'Allies & Friends': [
+        { name:'Lester Crest',       note:'Hacker and heist planner. Runs the assassinations.' },
+        { name:'Lamar Davis',        note:"Franklin's best friend. Constant source of chaos." },
+        { name:'Ron Jakowski',       note:"Trevor's anxious neighbour and right-hand man." },
+        { name:'Chef',               note:"Trevor's meth cook. Joins crew for Paleto Score." },
+        { name:'Wade Hebert',        note:"Trevor's dim-witted cousin. Lives at the Vanilla Unicorn." },
+        { name:'Chop',               note:"Lamar's Rottweiler. Playable via iFruit app." },
+      ],
+      'Hireable Heist Crew': [
+        { name:'Packie McReary',     note:'Gunman ★★★★. Unlocked via random event. GTA IV character.' },
+        { name:'Gustavo Mota',       note:'Gunman ★★★★. $14% cut. Premium reliability.' },
+        { name:'Chef',               note:'Gunman ★★★. Story character, 8% cut.' },
+        { name:'Karl Abolaji',       note:'Gunman ★★. 8% cut. Low skill, risky on hard heists.' },
+        { name:'Daryl Johns',        note:'Gunman ★★. 8% cut. Adequate for mid-tier jobs.' },
+        { name:'Hugh Welsh',         note:'Gunman ★. 7% cut. High failure risk.' },
+        { name:'Norm Richards',      note:'Gunman ★. 7% cut. Dies on harder missions.' },
+        { name:'Eddie Toh',          note:'Driver ★★★★★. 14% cut. Best driver.' },
+        { name:'Taliana Martinez',   note:'Driver ★★★★★. 5% cut. Unlocked via random event. Best value.' },
+        { name:'Karim Denz',         note:'Driver ★★. 8% cut. Budget option; poor on complex escapes.' },
+        { name:'Rickie Lukens',      note:'Hacker ★★. 4% cut. Unlocked via Friend Request replay.' },
+        { name:'Christian Feltz',    note:'Hacker ★★★. 10% cut.' },
+        { name:'Paige Harris',       note:'Hacker ★★★★. 15% cut. Best overall hacker.' },
+        { name:'Lester Crest',       note:'Hacker (logistics). Not hireable; auto-assigned.' },
+      ],
+      'Story Characters (Missions)': [
+        { name:'Dave Norton',        note:'Corrupt FIB agent. Made the deal that freed Michael.' },
+        { name:'Steve Haines',       note:'FIB agent antagonist. Orchestrates the bureau storyline.' },
+        { name:'Andreas Sanchez',    note:"Steve Haines's IAA-connected FIB partner." },
+        { name:'Martin Madrazo',     note:'Cartel boss. Michael owes him $2.5M after destroying his house.' },
+        { name:'Patricia Madrazo',   note:"Martin's kidnapped wife. Held at Trevor's trailer." },
+        { name:'Devin Weston',       note:'Tech billionaire. Hires the trio to steal cars. Final antagonist.' },
+        { name:'Molly Schultz',      note:"Devin Weston's lawyer. Dies during the Meltdown arc." },
+        { name:'Solomon Richards',   note:'Ageing film producer. Hires Trevor and Michael.' },
+        { name:'Lazlow Jones',       note:'Fame or Shame host. Humiliated by Trevor twice.' },
+        { name:'Simeon Yetarian',    note:"Armenian used-car dealer. Franklin's first employer." },
+        { name:'Jay Norris',         note:'LifeInvader CEO. Killed via phone bomb in Friend Request.' },
+        { name:'Hao',                note:'Street racer. Challenges Franklin in South LS.' },
+        { name:'Stretch',            note:"Lamar's gang contact. Working with the Ballas; betrayer." },
+        { name:'Harold "Stretch" Joseph', note:'Ballas-aligned traitor within the Families.' },
+        { name:'D',                  note:'Ballas member. Tracked via Chop in the mission Chop.' },
+        { name:'Mr. K (Ferdinand Kerimov)', note:'IAA prisoner. Tortured by Trevor in By the Book.' },
+        { name:'Wei Cheng',          note:'Triad boss. Kidnaps Trevor; runs operations from North Yankton.' },
+        { name:'Tao Cheng',          note:"Wei Cheng's son. Comes to Sandy Shores for the meth deal." },
+        { name:'Brad Snider',        note:'Killed during the Ludendorff prologue. Buried under Michael.' },
+        { name:'Denise Clinton',     note:"Franklin's aunt. Owns the Strawberry house at the game's start." },
+        { name:'Benny',              note:"Tonya's boyfriend. Always missing. Triggers Tonya's missions." },
+        { name:'Tonya Wiggins',      note:"Franklin's neighbour. Asks him to tow cars while JB is on a bender." },
+        { name:'Beverly Felton',     note:'Celebrity paparazzi. Hires Michael for the Paparazzo missions.' },
+        { name:'Omega',              note:'Sandy Shores conspiracy theorist. Spaceship Parts mission giver.' },
+        { name:'Dom Becker',         note:'Extreme sports enthusiast. Base jumping missions.' },
+        { name:'Barry',              note:'Pro-marijuana activist. Grass Roots missions.' },
+        { name:'Mary-Ann Quinn',     note:'Competitive fitness fanatic. Running/cycling races.' },
+        { name:'Maude Eccles',       note:'Bail bondsperson. Sends Trevor after 4 fugitives.' },
+        { name:'Cletus Ewing',       note:'Redneck hunter. Hunting buddy missions for Trevor.' },
+        { name:'Peter Dreyfuss',     note:'Film director who murdered actress Leonora Johnson.' },
+        { name:'Joe',                note:'Racist vigilante. Kidnaps Hispanic workers near O\'Neil ranch.' },
+        { name:'Josef',              note:"Joe's accomplice. Minute Man Blues antagonist." },
+        { name:'Manuel',             note:'One of Joe and Josef\'s abducted victims — actually a US citizen.' },
+        { name:'Ursula',             note:'Hitchhiker with a dark past. Found on Mt. Chiliad.' },
+        { name:'Floyd Herbert',      note:"Wade's cousin. Trevor takes over his Vespucci apartment." },
+        { name:'Debra',              note:"Floyd's girlfriend. Killed by Trevor when she threatens him." },
+        { name:'Rocco Pelosi',       note:'Extorts Solomon Richards. Chased by Michael and Trevor.' },
+        { name:'Kyle Chavis',        note:"Amanda's tennis coach. Triggers Marriage Counseling." },
+        { name:'Johnny Klebitz',     note:'Lost MC leader. Killed by Trevor in Mr. Philips. TLAD protagonist.' },
+        { name:'Clay Simons',        note:"Johnny's Lost MC lieutenant. Killed by Trevor." },
+        { name:'Terry Thorpe',       note:"Johnny's Lost MC lieutenant. Killed by Trevor." },
+        { name:'Elwood O\'Neil',     note:"Head of the O'Neil Brothers meth operation." },
+        { name:'Bob Mulét',          note:"Vinewood celebrity hairdresser. Franklin's strangers chain." },
+        { name:'Agent 14',           note:'IAA agent. Contact for several Online missions.' },
+        { name:'Nervous Ron',        note:"Trevor's paranoid associate. First Trevor mission." },
+      ],
+      'Antagonists': [
+        { name:'Steve Haines',       note:'FIB antagonist. Eliminated in Ending C.' },
+        { name:'Devin Weston',       note:'Tech billionaire. Eliminated in Ending C.' },
+        { name:'Wei Cheng',          note:'Triad boss. Eliminated in Ending C.' },
+        { name:'Harold "Stretch" Joseph', note:'Ballas traitor. Eliminated in Ending C.' },
+        { name:'Stretch',            note:'Duplicated alias entry, same as above.' },
+        { name:'Martin Madrazo',     note:'Survives; debt resolved after Paleto Score payout.' },
+        { name:'Trevor Philips',     note:'Killed in Ending A only.' },
+        { name:'Michael De Santa',   note:'Killed in Ending B only.' },
+        { name:'Simeon Yetarian',    note:'Thrown through window by Michael; never seen again.' },
+        { name:'Jay Norris',         note:'Killed via phone bomb, Friend Request.' },
+        { name:'Molly Schultz',      note:'Accidentally killed running from Franklin at airport.' },
+      ],
+    },
+  },
+
+  // ── WEAPONS ─────────────────────────────────────────────────────────────────
+  'Weapons': {
+    icon: '🔫', color: '#f43f5e',
+    groups: {
+      'Pistols': [
+        { name:'Pistol',                 note:'Standard sidearm. Default weapon. Story + Online.' },
+        { name:'Pistol .50',             note:'High-damage pistol. Ammu-Nation.' },
+        { name:'Combat Pistol',          note:'Semi-auto. Unlock after certain missions.' },
+        { name:'AP Pistol',              note:'Full-auto pistol. Devastates vehicles.' },
+        { name:'Stun Gun',               note:'Non-lethal. Incapacitates targets.' },
+        { name:'Flare Gun',              note:'Single flare shot. Online exclusive.' },
+        { name:'Heavy Pistol',           note:'Large-calibre sidearm. Ammu-Nation, Online.' },
+        { name:'Vintage Pistol',         note:'Old-school revolver-style. Online.' },
+        { name:'SNS Pistol',             note:'Small pocket pistol. Online.' },
+        { name:'Double-Action Revolver', note:'Red Dead Online crossover weapon.' },
+        { name:'Heavy Revolver',         note:'Powerful revolver. Online.' },
+        { name:'Heavy Revolver Mk II',   note:'Upgraded. Online.' },
+        { name:'Perico Pistol',          note:'Cayo Perico DLC.' },
+        { name:'Navy Revolver',          note:'Hidden in world; related to Serial Killer easter egg.' },
+        { name:'SNS Pistol Mk II',       note:'Online.' },
+        { name:'Pistol Mk II',           note:'Upgraded base pistol. Online.' },
+        { name:'AP Pistol (Mk II equivalent)', note:'Online modification pathway.' },
+      ],
+      'Shotguns': [
+        { name:'Pump Shotgun',           note:'Classic pump-action. Story + Online.' },
+        { name:'Pump Shotgun Mk II',     note:'Upgraded. Online.' },
+        { name:'Sawed-Off Shotgun',      note:'Concealable. Two-handed. Story + Online.' },
+        { name:'Assault Shotgun',        note:'Semi-auto. High fire rate.' },
+        { name:'Bullpup Shotgun',        note:'Compact, drum-fed. Online.' },
+        { name:'Musket',                 note:'Single-shot. Independence Day DLC, Online.' },
+        { name:'Heavy Shotgun',          note:'Large gauge, slow. High power.' },
+        { name:'Double Barrel Shotgun',  note:'Two shots, break-action. Online.' },
+        { name:'Sweeper Shotgun',        note:'Street sweeper-style. Online.' },
+        { name:'Combat Shotgun',         note:'Military-spec shotgun. Online.' },
+      ],
+      'SMGs': [
+        { name:'Micro SMG',              note:'Compact SMG. Driveable. Story + Online.' },
+        { name:'SMG',                    note:'Standard submachine gun.' },
+        { name:'SMG Mk II',              note:'Upgraded. Online.' },
+        { name:'Assault SMG',            note:'Higher accuracy SMG variant.' },
+        { name:'Combat PDW',             note:'Compact PDW. Online.' },
+        { name:'Machine Pistol',         note:'One-handed. Driveable. Online.' },
+        { name:'Mini SMG',               note:'Ultra-compact. Driveable. Online.' },
+        { name:'Unholy Hellbringer',      note:'Alien weapon. Online Arena War DLC.' },
+      ],
+      'Assault Rifles': [
+        { name:'Assault Rifle',          note:'Standard AR. AK-variant styling.' },
+        { name:'Assault Rifle Mk II',    note:'Upgraded.' },
+        { name:'Carbine Rifle',          note:'M4-style. More accurate.' },
+        { name:'Carbine Rifle Mk II',    note:'Upgraded.' },
+        { name:'Advanced Rifle',         note:'Fast fire rate. Compact.' },
+        { name:'Special Carbine',        note:'G36-style. Online.' },
+        { name:'Special Carbine Mk II',  note:'Upgraded. Online.' },
+        { name:'Bullpup Rifle',          note:'AUG-style. Online.' },
+        { name:'Bullpup Rifle Mk II',    note:'Upgraded. Online.' },
+        { name:'Compact Rifle',          note:'Driveable. Online.' },
+        { name:'Military Rifle',         note:'High damage AR. Online.' },
+        { name:'Heavy Rifle',            note:'Large-calibre AR. Online.' },
+        { name:'Tactical Rifle',         note:'Burst-fire AR. Online.' },
+      ],
+      'LMGs': [
+        { name:'MG',                     note:'Machine gun. Bipod-based.' },
+        { name:'Combat MG',              note:'Faster, more portable.' },
+        { name:'Combat MG Mk II',        note:'Upgraded.' },
+        { name:'Gusenberg Sweeper',      note:'Tommy gun variant. Valentine\'s Day DLC.' },
+        { name:'Heavy MG (Minigun tiers)', note:'High-capacity sustained fire.' },
+      ],
+      'Sniper Rifles': [
+        { name:'Sniper Rifle',           note:'Semi-auto bolt-action. Story + Online.' },
+        { name:'Sniper Rifle Mk II',     note:'Upgraded.' },
+        { name:'Heavy Sniper',           note:'Anti-materiel. Can damage vehicles.' },
+        { name:'Heavy Sniper Mk II',     note:'Remote explosive rounds. Online.' },
+        { name:'Marksman Rifle',         note:'Semi-auto precision rifle. Online.' },
+        { name:'Marksman Rifle Mk II',   note:'Upgraded. Online.' },
+      ],
+      'Heavy Weapons': [
+        { name:'RPG',                    note:'Rocket-propelled grenade launcher.' },
+        { name:'Grenade Launcher',       note:'40mm launcher. Single-shot.' },
+        { name:'Grenade Launcher Smooth Bore', note:'Online variant.' },
+        { name:'Minigun',                note:'Six-barrel rotary. Cannot sprint while equipped.' },
+        { name:'Firework Launcher',      note:'4th July DLC. Online.' },
+        { name:'Railgun',                note:'Military prototype. Story: Ending C. Online.' },
+        { name:'Homing Launcher',        note:'Lock-on missile launcher. Online.' },
+        { name:'Compact Grenade Launcher', note:'Shorter range. Online.' },
+        { name:'Widowmaker',             note:'Alien minigun variant. Online Arena War.' },
+        { name:'Emplacement Gun (mounted)', note:'Fixed turret. Various military vehicles.' },
+        { name:'Patrol Torpedo (submarine)', note:'Vehicle-mounted weapon.' },
+        { name:'Vehicle Mounted Weapons', note:'Various: Buzzard rockets, Hydra cannons, Insurgent .50.' },
+      ],
+      'Throwables': [
+        { name:'Grenade',                note:'Frag grenade. Timed fuse.' },
+        { name:'Sticky Bomb',            note:'Remote detonation. Essential for heists.' },
+        { name:'Proximity Mine',         note:'Vehicle-triggered IED. Online.' },
+        { name:'BZ Gas',                 note:'Incapacitating gas grenade.' },
+        { name:'Tear Gas',               note:'Crowd control. Online.' },
+        { name:'Molotov Cocktail',       note:'Incendiary thrown weapon.' },
+        { name:'Fire Bottle',            note:'Online variant of Molotov.' },
+        { name:'Pipe Bomb',              note:'Low-cost explosive. Craftable.' },
+        { name:'Snowball',               note:'Seasonal. Christmas DLC.' },
+        { name:'Baseball',               note:'Throwable blunt.' },
+        { name:'Flare',                  note:'Signal flare. Throwable.' },
+        { name:'Acid Package',           note:'Online Acid Lab DLC.' },
+        { name:'EMP Device',             note:'Vehicle disabler. Online Heists.' },
+      ],
+      'Melee': [
+        { name:'Knife',                  note:'Standard melee. Stealth takedowns.' },
+        { name:'Nightstick',             note:'Police baton. Lootable from officers.' },
+        { name:'Hammer',                 note:'Construction melee.' },
+        { name:'Baseball Bat',           note:'Wide swing arc. Classic GTA weapon.' },
+        { name:'Golf Club',              note:'High damage. Single swing.' },
+        { name:'Crowbar',                note:'Pry weapon.' },
+        { name:'Bottle (broken)',        note:'Improvised melee.' },
+        { name:'Knuckle Dusters',        note:'Brass knuckles.' },
+        { name:'Machete',                note:'Wide blade. High damage.' },
+        { name:'Hatchet',                note:'Throwable melee. Online.' },
+        { name:'Flashlight',             note:'Functional + melee.' },
+        { name:'Pool Cue',               note:'Long reach. Billiards weapon.' },
+        { name:'Switchblade',            note:'Concealable. Online Biker DLC.' },
+        { name:'Battle Axe',             note:'Online.' },
+        { name:'Stone Hatchet',          note:'Red Dead Online crossover. Online.' },
+        { name:'Candy Cane',             note:'Seasonal melee. Christmas DLC.' },
+        { name:'Wrench',                 note:'Mechanic melee. Online.' },
+        { name:'Pipe Wrench',            note:'Online.' },
+        { name:'Unarmed (Fists)',        note:'Default. Context-sensitive grapple.' },
+        { name:'Chainsaw',               note:'Online. High gore, slow.' },
+        { name:'Shovel',                 note:'Digging-themed melee. Online.' },
+      ],
+      'Special / Unique': [
+        { name:'Jerry Can',              note:'Spray gasoline trails. Ignite with any weapon.' },
+        { name:'Parachute',              note:'Wearable deploy. Required above certain altitudes.' },
+        { name:'Fire Extinguisher',      note:'Suppression tool. Story use.' },
+        { name:'Ball (sports)',          note:'Basketball, football, tennis. Activity tool.' },
+        { name:'Digiscanner',            note:'Cayo Perico DLC scope.' },
+        { name:'Laser Designator',       note:'Calls in orbital strikes. Online.' },
+        { name:'Pepper Spray',           note:'Non-lethal. Online.' },
+        { name:'Tactical SMG',           note:'Online DLC.' },
+        { name:'Drone',                  note:'Remote-controlled recon. Online.' },
+        { name:'Orbital Cannon',         note:'Property weapon. Online. One-hit. $500K/use.' },
+        { name:'Missile Battery (vehicle)', note:'Fixed or vehicle-mounted. Multiple Online vehicles.' },
+        { name:'Unholy Hellbringer (alien AR)', note:'Online Arena War / UFO events.' },
+        { name:'Widowmaker (alien minigun)', note:'Online Arena War / UFO events.' },
+        { name:'Compressed Air Gun',     note:'Silent. Blows targets away. Online.' },
+      ],
+    },
+  },
+
+  // ── VEHICLES ────────────────────────────────────────────────────────────────
+  'Vehicles': {
+    icon: '🚗', color: '#67e8f9',
+    groups: {
+      'Sports Cars': [
+        'Annis Elegy RH8','Annis Elegy Retro Custom','Annis RE-7B','Annis S80RR',
+        'Benefactor Feltzer','Benefactor Schwartzer','Bravado Banshee','Bravado Banshee 900R',
+        'Cheval Surge','Dewbauchee Exemplar','Dewbauchee Massacro','Dewbauchee Massacro Racecar',
+        'Dewbauchee Rapid GT','Dewbauchee Rapid GT Classic','Dewbauchee Seven-70','Dewbauchee Specter',
+        'Dewbauchee Specter Custom','Dinka Blista Kanjo','Dinka Jester','Dinka Jester Classic',
+        'Dinka Jester RR','Dinka Sugoi','Dinka Toro','Emperor ETR1',
+        'Gallivanter Baller (Sport)','Grotti Brioso R/A','Grotti Carbonizzare','Grotti Furia',
+        'Grotti Itali GTO','Grotti Turismo R','Imponte Ruiner','Imponte Ruiner 2000',
+        'Imponte Ruiner 3','Invetero Coquette','Invetero Coquette BlackFin','Invetero Coquette Classic',
+        'Karin Calico GTF','Karin Futo','Karin Futo GTX','Karin Sultan',
+        'Karin Sultan Classic','Karin Sultan RS','Karin Sultan RS Custom',
+        'Lampadati Furore GT','Lampadati Novak','Maibatsu Penumbra','Maibatsu Penumbra FF',
+        'Ocelot Jugular','Ocelot Lynx','Ocelot Pariah','Obey 9F',
+        'Obey 9F Cabrio','Obey Omnis','Obey Omnis e-GT','Pegassi Infernus',
+        'Pegassi Infernus Classic','Pegassi Reaper','Pfister 811','Pfister Comet',
+        'Pfister Comet Classic','Pfister Comet Retro Custom','Pfister Comet Safari',
+        'Pfister Comet SR','Schyster Fusilade','Übermacht Sentinel','Übermacht Sentinel Classic',
+        'Übermacht Sentinel Classic Widebody','Übermacht Zion','Übermacht Zion Cabrio',
+        'Vapid Firebolt','Vapid Flash GT','Vapid Retinue','Vapid Retinue Mk II',
+        'Vapid Zaphodeo','Vulcar Warrener HKR',
+      ],
+      'Super Cars': [
+        'Adder (Bugatti Veyron)','Benefactor Krieger','Benefactor Schlagen GT',
+        'Bravado Bruiser (story only)','Cheval Taipan','Dewbauchee X80 Proto',
+        'Emperor Vectre','Grotti Furia','Grotti Itali GTO Stinger LX',
+        'Grotti Itali RSX','Grotti Prototipo','Grotti Visione','Grotti X80 Proto',
+        'HVY Insurgent Pick-Up Custom (Super class)','Imponte Deluxo (flying)',
+        'Imponte Phoenix (not super)','Lampadati Corsita','Lampadati Tigon',
+        'Obey 8F Drafter','Ocelot Penetrator','Ocelot XA-21','Ocelot Locust',
+        'Pegassi Bati 801 (motorcycle, not super)',
+        'Pegassi Osiris','Pegassi Tempesta','Pegassi Tezeract','Pegassi Torero XO',
+        'Pegassi Vacca','Pegassi Zentorno','Pfister 811','Pfister Neon',
+        'Progen GP1','Progen Itali GTB','Progen Itali GTB Custom',
+        'Progen PR4','Progen T20','Progen Tyrus',
+        'Truffade Adder','Truffade Nero','Truffade Nero Custom','Truffade Thrax',
+        'Truffade Z-Type','Vapid FMJ','Vysser Neo',
+      ],
+      'Muscle Cars': [
+        'Albany Buccaneer','Albany Buccaneer Custom','Albany Cavalcade (not muscle but listed)',
+        'Albany Franken Stange','Albany Hermes','Albany Roosevelt','Albany Roosevelt Valor',
+        'Bravado Gauntlet','Bravado Gauntlet Classic','Bravado Gauntlet Classic Custom',
+        'Bravado Gauntlet Hellfire','Bravado Greenwood','Bravado Redwood Gauntlet',
+        'Cheval Marshall (off-road actual)','Declasse Drift Yosemite','Declasse Mamba',
+        'Declasse Moonbeam','Declasse Moonbeam Custom','Declasse Sabre Turbo',
+        'Declasse Sabre Turbo Custom','Declasse Tampa','Declasse Tampa Custom',
+        'Declasse Tulip','Declasse Tulip M-100','Declasse Vigero','Declasse Vigero ZX',
+        'Declasse Voodoo','Declasse Yosemite','Declasse Yosemite Rancher',
+        'Imponte Dukes','Imponte Dukes O\'Death','Imponte Phoenix',
+        'Imponte Ruiner','Karin Hotring Everon','Karin Calico GTF',
+        'Vapid Dominator','Vapid Dominator ASP','Vapid Dominator GTT','Vapid Dominator GTX',
+        'Vapid Pißwasser Dominator','Vapid Showroom Dominator','Vapid Ellie',
+        'Vapid Redwood Racecar',
+      ],
+      'Sedans & Coupes': [
+        'Albany Emperor','Albany Emperor (Rusty)','Albany Primo','Albany Primo Custom',
+        'Benefactor Schafter (V8)','Benefactor Schafter LWB','Benefactor Stirling GT',
+        'Cheval Fugitive','Cheval Surge','Classique Connoisseur',
+        'Declasse Asea','Declasse Asea Two','Declasse Premier',
+        'Enus Cognoscenti','Enus Cognoscenti (Armoured)','Enus Cognoscenti 55',
+        'Enus Cognoscenti 55 (Armoured)','Enus Gambler','Enus Windsor',
+        'Enus Windsor Drop','Gallivanter Baller','Gallivanter Baller II',
+        'Gallivanter Baller ST','Gallivanter Baller ST-D',
+        'Imponte DF8-90','Karin Asterope','Karin Dilettante','Karin Dilettante (Patrol)',
+        'Karin Intruder','Lampadati Felon','Lampadati Felon GT',
+        'Obey Tailgater','Obey Tailgater S','Übermacht Oracle','Übermacht Oracle XS',
+        'Vapid Stanier','Vapid Stanier (LE)','Vapid Unnamed Police Cruiser',
+        'Vulcar Ingot','Vulcar Nebula Turbo','Zirconium Stratum',
+      ],
+      'SUVs & Off-Road': [
+        'Albany Cavalcade','Albany Cavalcade FXT',
+        'Benefactor Dubsta','Benefactor Dubsta 6x6','Benefactor Dune Buggy',
+        'Bravado Bison','Bravado Bison (various liveries)',
+        'BF Injection','BF Bifta','BF Club','BF Dune Buggy','BF Weevil','BF Weevil Custom',
+        'Canis Bodhi','Canis Crusader','Canis Freecrawler','Canis Kamacho',
+        'Canis Mesa','Canis Mesa (Merryweather)','Canis Mesa 3-door',
+        'Cheval Marshall','Dinka Verus','Desert Raid',
+        'Dundreary Landstalker','Dundreary Landstalker XL','Dundreary Novak',
+        'Grotti Portalope (sport)','HVY Nightshark','HVY Insurgent','HVY Insurgent Pick-Up',
+        'HVY Insurgent Pick-Up Custom','HVY APC','HVY Brickade','HVY Brickade 6x6',
+        'Karin Beejay XL','Karin Rebel (Clean)','Karin Rebel (Rusty)','Karin SlamVan',
+        'Karin Technical (open-top truck)','Mammoth Patriot','Mammoth Patriot Military',
+        'Mammoth Patriot Mil-Spec','Mammoth Patriot Stretch',
+        'Nagasaki Blazer','Nagasaki Blazer Aqua','Nagasaki Blazer Lifeguard',
+        'Vapid Radius','Vapid Riata','Vapid Sandking SWB','Vapid Sandking XL',
+        'Vapid Caracara','Vapid Caracara 4x4',
+      ],
+      'Vans & Trucks': [
+        'Albany Pony','Albany Pony XL',
+        'Bravado Rumpo','Bravado Rumpo Custom','Bravado Youga','Bravado Youga Classic',
+        'Brute Boxville','Brute Boxville (Work)','Brute Camper','Brute Journey',
+        'Brute Pony','Brute Tipper','Brute Tipper (6-wheel)','Brute Utility Truck',
+        'Declasse Burrito','Declasse Burrito (Gang)','Declasse Rancher XL',
+        'Jobuilt Mixmaster','Jobuilt Phantom','Jobuilt Phantom Custom',
+        'Jobuilt Phantom Wedge','Jobuilt Rubble',
+        'Maibatsu Mule','Maibatsu Mule Custom','Maibatsu Mule 2','Maibatsu Mule 3',
+        'MTL Brickade','MTL Flatbed','MTL Packer','MTL Wastelander',
+        'Vapid Bobcat XL','Vapid Speedo','Vapid Speedo Custom',
+        'Vapid Tow Truck','Vapid Tow Truck (Long)','Vapid Benson',
+      ],
+      'Emergency Vehicles': [
+        'Brute Fire Truck','Brute Fire Truck (smaller variant)',
+        'Declasse Ambulance',
+        'Police Cruiser (Vapid Stanier LE)','Police Cruiser (Pursuit)','Police Cruiser (Interceptor)',
+        'Police Rancher (Declasse)','Police Transporter',
+        'Unmarked Cruiser (FIB Buffalo)','FIB Buffalo','FIB Granger',
+        'NOOSE Cruiser','NOOSE Patriot','Riot (Police)','Sheriff Cruiser',
+        'Sheriff SUV','Park Ranger (Declasse)',
+        'Lifeguard (Nagasaki)','Undercover Cruiser',
+      ],
+      'Motorcycles': [
+        'BF400','Carbon RS','Daemon','Daemon Custom','Defiler',
+        'Dinka Akuma','Dinka Thrust','Enduro',
+        'FCR 1000','FCR 1000 Custom',
+        'Gargoyle','Hakuchou','Hakuchou Custom','Hakuchou Drag',
+        'Hexer','Innovation','Lectro',
+        'Manchez','Manchez Scout','Manchez Scout C',
+        'Nagasaki BF400','Nagasaki Carbon RS',
+        'PCJ-600 (Dinka)','Rat Bike',
+        'Ruffian','Sanchez','Sanchez (Dirty)','Shotaro','Vader',
+        'Vindicator','Vortex','Western Bagger','Western Daemon',
+        'Western Nightblade','Western Rat Bike','Western Revolver','Western Sovereign',
+        'Wolfsbane',
+      ],
+      'Bicycles': [
+        'BMX (Whippet)','Cruiser','Downhill Bike','Endurex Race Bike',
+        'Fixter','Scorcher','Tribike','Tribike 2','Tribike 3','Whippet Race Bike',
+      ],
+      'Aircraft': [
+        'Atomic Blimp (non-flyable, story/DLC)',
+        'B-11 Strikeforce','Buckingham Alpha-Z1','Buckingham Luxor','Buckingham Luxor Deluxe',
+        'Buckingham Maverick','Buckingham Nimbus','Buckingham Swift','Buckingham Swift Deluxe',
+        'Buckingham Tula','Buckingham Vestra','Buckingham Volatus',
+        'Duster','RM-10 Bombushka',
+        'Howard NX-25','Jobuilt P-996 Lazer (Military jet)','Jobuilt Velum',
+        'Jobuilt Velum 5-seater','LF-22 Starling',
+        'Mammoth Avenger','Mammoth Hydra (VTOL jet)','Mammoth Thruster',
+        'Nagasaki Havok','Nagasaki Ultralight',
+        'Pegassi Oppressor Mk II (rocket bike/aircraft)',
+        'Raven (Merryweather helicopter)',
+        'Savage (Mammoth attack heli)','Sea Sparrow','Sea Sparrow (Mk II)',
+        'Titan (cargo plane)','Western Besra (trainer jet)',
+        'Western Company Cargobob','Western Company Cargobob (Jetsam)',
+        'Western Company Frogger','Western Company Frogger (FIB)',
+        'Western Company Maverick','Western Company Skylift',
+        'Western Rogue','Western Seabreeze',
+      ],
+      'Watercraft': [
+        'Buckingham Tug','Dinghy','Dinghy (2-seater)','Dinghy (4-seater)',
+        'HVY Barracks Semi (amphibious, partial)',
+        'Kraken (submarine)','Lampadati Toro (speedboat)',
+        'Nagasaki Dinghy','Police Predator (police boat)',
+        'Shitzu Jetmax','Shitzu Longfin','Shitzu Predator',
+        'Shitzu Squalo','Shitzu Suntrap','Shitzu Tropic','Shitzu Tropic 2',
+        'Speedophile 2000','Speedophile Seashark','Speedophile Seashark (Lifeguard)',
+        'Speedophile Seashark (Yacht)','Sub Bike',
+        'TR-2 (weapon boat)','Weaponized Tampa (amphibious concept)',
+        'Yacht (Galaxy Super Yacht – non-driveable, purchasable)',
+        'Kosatka (Cayo Perico submarine)',
+      ],
+      'Military': [
+        'Barracks (Heavy truck)','Barracks Semi','Crusader (Canis)',
+        'HVY APC (amphibious)','HVY Chernobog (missile launcher)',
+        'HVY Menacer','HVY Nightshark','HVY Scarab','HVY Scarab (versions)',
+        'HVY Storm Dragon','HVY Wedge',
+        'Invade and Persuade Tank','Khanjali Tank',
+        'Mammoth Patriot Military','Mammoth Thruster (jetpack)',
+        'Rhino Tank','TM-02 Khanjali',
+        'RM-10 Bombushka (bomber)','Mammoth Avenger (stealth plane)',
+        'Atomizer-equipped vehicles (Online)',
+      ],
+      'Special / Story Only': [
+        'Blazer (Omega Space Docker – Spaceship Parts reward)',
+        'Duke O\'Death (Dukes armoured – Strangers reward)',
+        'Imponte Ruiner 2000 (rocket launcher car – Import/Export)',
+        'FIB Buffalo (unmarked – story mission spawn)',
+        'Merryweather Mesa (story spawn)',
+        'Gruppe Sechs Stockade (heist getaway)',
+        'Police Maverick (helicopter – story missions)',
+        'Prison Bus (Bolingbroke)',
+        'Lifeguard Blazer (Chumash patrol spawn)',
+        'Towtruck (story – used in Tonya missions)',
+        'Skylift (crane helicopter – used in Sidetracked)',
+        'Flatbed (Big Score obvious approach)',
+        'Driller (Big Score subtle approach)',
+        'Insurgent (Trevor arms missions)',
+        'Technical (Blaine County random spawn)',
+        'Tanker Truck (story tanker missions)',
+        'BobCat Security Van (Blitz Play)',
+        'Armoured Boxville (NOOSE response)',
+        'Cargobob (various mission spawns)',
+        'Titan (Minor Turbulence – hijacked cargo plane)',
+      ],
+      'NPC Ambient Spawns (Street Traffic)': [
+        'Albany Emperor','Albany Primo','Blista (Dinka)',
+        'Declasse Asea','Declasse Premier','Declasse Rancher XL',
+        'Dundreary Landstalker','Gallivanter Baller','Gallivanter Baller II',
+        'Greenwood (Albany)','HVY Dump (construction site)',
+        'Ingot (Vulcar)','Intruder (Karin)','Issi (Dinka)',
+        'Journey (Brute motorhome)','Karin Asterope','Karin Dilettante',
+        'Minivan (Vapid)','Moonbeam (Declasse, rusty)','Mule (Maibatsu delivery truck)',
+        'Pony (Albany transit van)','Premier (Declasse)','Primo (Albany)',
+        'Rancher XL (police, park ranger variants)',
+        'Ruiner (Imponte, highway spawn)','Rumpo (Bravado, van)',
+        'Sandking (Vapid, Sandy Shores)','Sabre Turbo (Declasse, rare night spawn)',
+        'Stanier (Vapid, taxi variant)','Stratum (Zirconium estate)',
+        'Surfer (Bravado VW Bus, beach spawn)','Tornado (Declasse lowrider, Davis)',
+        'Vigero (Declasse, rare night spawn)','Voodoo (Declasse, Davis)',
+        'Washington (Albany, Vinewood Hills)','Zion (Übermacht, Rockford Hills)',
+      ],
+    },
+  },
+
+};
+
+// ── Sidebar renderer for info sections ──────────────────────────────────────────
+
+function buildInfoSection(sectionName, section) {
+  const catDiv = document.createElement('div');
+  catDiv.className = 'tree-cat';
+
+  const header = document.createElement('div');
+  header.className = 'tree-cat-header';
+  header.style.cssText = 'border-left:2px solid ' + section.color + ';';
+
+  const labelSpan = document.createElement('span');
+  const totalCount = Object.values(section.groups).reduce((s, g) => s + g.length, 0);
+  labelSpan.innerHTML =
+    `<span style="margin-right:6px">${section.icon}</span>${sectionName} <span class="cat-count">${totalCount}</span>`;
+
+  const arrow = document.createElement('span');
+  arrow.className = 'cat-arrow';
+  arrow.textContent = '▶';
+
+  header.append(labelSpan, arrow);
+
+  const itemsList = document.createElement('div');
+  itemsList.className = 'tree-items';
+
+  header.addEventListener('click', () => {
+    const isOpen = itemsList.classList.contains('open');
+    itemsList.classList.toggle('open', !isOpen);
+    header.classList.toggle('open', !isOpen);
+  });
+
+  // sub-group label + clickable item rows
+  Object.entries(section.groups).forEach(([groupLabel, items]) => {
+    const subHeader = document.createElement('div');
+    subHeader.style.cssText =
+      'font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;' +
+      'color:' + section.color + ';padding:7px 16px 3px 28px;opacity:.8;';
+    subHeader.textContent = groupLabel + ' (' + items.length + ')';
+    itemsList.appendChild(subHeader);
+
+    items.forEach(item => {
+      const name = typeof item === 'string' ? item : item.name;
+      const note = typeof item === 'string' ? '' : (item.note || '');
+      const row = document.createElement('div');
+      row.className = 'tree-item';
+      row.style.cssText = 'padding-left:32px;';
+      row.innerHTML =
+        `<span style="width:5px;height:5px;border-radius:50%;background:${section.color};display:inline-block;flex-shrink:0;margin-right:6px;opacity:.7;"></span>` +
+        `<span class="item-name" style="font-size:11px;">${name}</span>`;
+
+      row.addEventListener('click', () => {
+        openInfoPanel(sectionName, groupLabel, name, note, section.color);
+      });
+
+      itemsList.appendChild(row);
+    });
+  });
+
+  catDiv.append(header, itemsList);
+  return catDiv;
+}
+
+function openInfoPanel(section, group, name, note, color) {
+  const rp = document.getElementById('right-panel');
+  const rpBody = document.getElementById('rp-body');
+  const rpTitle = document.getElementById('rp-title');
+
+  rpTitle.textContent = name;
+  rp.classList.remove('rp-hidden');
+
+  rpBody.innerHTML =
+    `<div style="padding:1.25rem 0">` +
+    `<div style="background:var(--color-bg-p);border:0.5px solid var(--color-border);border-radius:12px;overflow:hidden">` +
+    `<div style="background:#1a1a2e;padding:1.25rem 1.5rem;border-bottom:0.5px solid rgba(255,255,255,0.08)">` +
+    `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">` +
+    `<span style="font-size:10px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:${color};background:${color}20;border:0.5px solid ${color}40;border-radius:4px;padding:2px 8px;">${section} › ${group}</span>` +
+    `</div>` +
+    `<h2 style="font-size:20px;font-weight:500;color:#fff;margin:0 0 6px">${name}</h2>` +
+    (note ? `<p style="font-size:13px;color:rgba(255,255,255,0.5);margin:0;line-height:1.5">${note}</p>` : '') +
+    `</div>` +
+    `<div style="padding:1.25rem 1.5rem">` +
+    `<div style="background:rgba(247,201,72,0.06);border:0.5px solid rgba(247,201,72,0.2);border-radius:8px;padding:10px 12px">` +
+    `<p style="font-size:12px;color:var(--muted);margin:0;line-height:1.5">📝 Full card for this entry coming soon.</p>` +
+    `</div></div></div></div>`;
+
+  setTimeout(() => map.invalidateSize({ pan: false }), 310);
+}
+
+// ── Inject all info sections after map tree ───────────────────────────────────
+
+Object.entries(INFO_SECTIONS).forEach(([name, section]) => {
+  treeWrap.appendChild(buildInfoSection(name, section));
+});
+
+
+
 // 11. AUTO-OPEN PALETO SCORE ON LOAD
 // ════════════════════════════════════════════════════════════
 setTimeout(() => {
