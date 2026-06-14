@@ -7,6 +7,9 @@
  *
  * Also added missing ZOOM_FOR_TYPE entries for Vehicle Spawn,
  * Epsilon Car, and Epsilon Tract (now zoom 7 instead of falling back to 6).
+ *
+ * UPDATE: Added "Weapons" group with all GTA V weapon categories from
+ * the FiveM weapon-models reference.
  */
 
 const CAT_GROUPS = {
@@ -41,6 +44,17 @@ const CAT_GROUPS = {
     'Gang Territory',
     'Activity',
   ],
+  'Weapons': [
+    'Pistol',
+    'SMG',
+    'Shotgun',
+    'Assault Rifle',
+    'LMG',
+    'Sniper Rifle',
+    'Heavy Weapon',
+    'Thrown',
+    'Melee',
+  ],
 };
 
 /** How far to zoom in when flying to a location of each type. */
@@ -64,4 +78,14 @@ const ZOOM_FOR_TYPE = {
   'Strangers & Freaks': 6,
   'Assassination':      6,
   'Vehicle Spawn':      7,  // BUG FIX: was missing, fell back to 6
+  // Weapon types — zoom to district level
+  'Pistol':             7,
+  'SMG':                7,
+  'Shotgun':            7,
+  'Assault Rifle':      7,
+  'LMG':                7,
+  'Sniper Rifle':       7,
+  'Heavy Weapon':       7,
+  'Thrown':             7,
+  'Melee':              7,
 };
